@@ -526,6 +526,17 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const gImg = images[gender] || images['mujer']; // Backup fallback
+        const isSenior = parseInt(userProfile.age) >= 60;
+        const isBeginner = lvl === 'principiante';
+        const useAsistedImgs = isSenior || isBeginner;
+
+        const seniorImgs = {
+            squat: ['assets/elder_squat1.png', 'assets/elder_squat2.png'],
+            pushup: ['assets/elder_pushup1.png', 'assets/elder_pushup2.png'],
+            plank: ['assets/elder_plank1.png', 'assets/elder_plank2.png'],
+            rot: ['assets/elder_rot1.png', 'assets/elder_rot2.png']
+        };
+
         const hasEscoba = equip.includes('escoba');
         const hasGradas = equip.includes('gradas');
         
@@ -539,12 +550,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 frames: gImg.escoba || gImg.warmupArms
             });
         } else {
+            let warmupName = isSenior ? 'Calentamiento (1/3): Rotación Sentado' : 'Calentamiento (1/3): Círculos de Brazos';
+            let warmupTip = isSenior ? 'Siéntate en una silla firme. Gira tu torso lentamente de un lado a otro para no forzar la espalda baja.' : 'Rotaciones muy amplias. Empieza pequeño y agranda el círculo.';
             routine.push({
                 type: 'warmup',
-                name: 'Calentamiento (1/3): Círculos de Brazos',
-                tip: 'Rotaciones muy amplias. Empieza pequeño y agranda el círculo.',
+                name: warmupName,
+                tip: warmupTip,
                 duration: 60,
-                frames: gImg.warmupArms
+                frames: isSenior ? seniorImgs.rot : gImg.warmupArms
             });
         }
 
@@ -611,27 +624,32 @@ document.addEventListener('DOMContentLoaded', () => {
             strengthOptions.push({ type: 'work', name: `Sentadillas con ${eqName}`, tip: eqTip, duration: repTime, frames: gImg.weights });
             strengthOptions.push({ type: 'work', name: `Peso Muerto con ${eqName}`, tip: 'Flexiona ligeramente las rodillas, empuja glúteos atrás.', duration: repTime, frames: gImg.weights });
         } 
-        if (hasChair) {
-            let squatName = lvl === 'principiante' ? 'Sentadilla Asistida (Silla)' : 'Sentadilla Tocando Silla';
-            strengthOptions.push({ type: 'work', name: squatName, tip: 'Controla la bajada hasta casi sentarte.', duration: repTime, frames: gImg.chair });
+        if (hasChair || useAsistedImgs) {
+            let squatName = isBeginner ? 'Sentadilla Asistida (Silla)' : 'Sentadilla Tocando Silla';
+            if(isSenior) squatName = 'Sentadilla Asistida (Adulto Mayor)';
             
-            let dipName = lvl === 'principiante' ? 'Fondos en Silla (Rodillas dobladas)' : 'Fondos en Silla (Piernas estiradas)';
-            strengthOptions.push({ type: 'work', name: dipName, tip: isHombro ? 'Cuidado: No bajes más allá de 90°.' : 'Baja el peso apuntando codos atrás.', duration: repTime, frames: gImg.chair });
+            let squatTip = isSenior ? 'Apóyate siempre en el respaldo de la silla al bajar y subir.' : 'Controla la bajada hasta casi sentarte.';
+            strengthOptions.push({ type: 'work', name: squatName, tip: squatTip, duration: repTime, frames: useAsistedImgs ? seniorImgs.squat : gImg.chair });
+            
+            if(!isSenior) {
+                let dipName = lvl === 'principiante' ? 'Fondos en Silla (Rodillas dobladas)' : 'Fondos en Silla (Piernas estiradas)';
+                strengthOptions.push({ type: 'work', name: dipName, tip: isHombro ? 'Cuidado: No bajes más allá de 90°.' : 'Baja el peso apuntando codos atrás.', duration: repTime, frames: gImg.chair });
+            }
         } 
         
         // PROGRESIÓN DE FLEXIONES
         let pushName = 'Flexiones Rápidas';
         let pushTip = 'Cuerpo recto como tabla.';
-        if (lvl === 'principiante') {
-            pushName = 'Flexiones Apoyando Rodillas';
-            pushTip = 'Mantén las rodillas en el piso para restar peso corporal. Baja poco si te cuesta.';
+        if (useAsistedImgs) {
+            pushName = isSenior ? 'Flexiones en Pared (Impacto Cero)' : 'Flexiones Apoyando Rodillas';
+            pushTip = isSenior ? 'Apóyate de pie frente a una pared a un paso de distancia.' : 'Mantén las rodillas en el piso para restar peso corporal. Baja poco si te cuesta.';
         } else if (lvl === 'intermedio') {
             pushName = 'Flexiones Estándar (Pushups)';
         } else {
             pushName = 'Flexiones Declinadas o Lentas';
             pushTip = 'Baja en 3 segundos y sube en 1 segundo explosivo.';
         }
-        strengthOptions.push({ type: 'work', name: pushName, tip: isHombro ? 'Apóyate en pared oblicua para cuidar hombros.' : pushTip, duration: repTime, frames: gImg.pushups });
+        strengthOptions.push({ type: 'work', name: pushName, tip: isHombro ? 'Apóyate en pared oblicua para cuidar hombros.' : pushTip, duration: repTime, frames: useAsistedImgs ? seniorImgs.pushup : gImg.pushups });
 
         circuitBlock.push(strengthOptions[currentDay % strengthOptions.length]);
         if(strengthOptions.length > 1) {
@@ -641,9 +659,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // PROGRESIÓN DE CORE / PLANCHAS
         let coreName = '';
         let coreTip = '';
-        if (lvl === 'principiante') {
-            coreName = 'Plancha Apoyando Rodillas';
-            coreTip = 'Apoya brazos y rodillas. Aprieta el abdomen hacia adentro.';
+        if (useAsistedImgs) {
+            coreName = isSenior ? 'Plancha de Rodillas (Adaptada)' : 'Plancha Apoyando Rodillas';
+            coreTip = isSenior ? 'Ve a tu propio ritmo. Si el suelo es difícil, hazlo apoyado en la cama.' : 'Apoya brazos y rodillas. Aprieta el abdomen hacia adentro.';
         } else if (lvl === 'intermedio') {
             coreName = 'Plancha Abdominal Larga';
             coreTip = 'Apoya antebrazos y puntas de pies. Cuerpo alineado horizontal.';
@@ -653,8 +671,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         let coreOptions = [
-            { type: 'work', name: coreName, tip: coreTip, duration: lvl === 'avanzado' ? 60 : 30, frames: gImg.plank },
-            { type: 'work', name: 'Plancha Lateral Contigua', tip: 'Gira apoyando un solo brazo para impactar oblicuos.', duration: lvl === 'avanzado' ? 45 : 20, frames: gImg.plank },
+            { type: 'work', name: coreName, tip: coreTip, duration: lvl === 'avanzado' ? 60 : 30, frames: useAsistedImgs ? seniorImgs.plank : gImg.plank },
+            { type: 'work', name: 'Plancha Lateral Contigua', tip: 'Gira apoyando un solo brazo para impactar oblicuos.', duration: lvl === 'avanzado' ? 45 : 20, frames: useAsistedImgs ? seniorImgs.plank : gImg.plank },
         ];
         circuitBlock.push(coreOptions[currentDay % coreOptions.length]);
 
