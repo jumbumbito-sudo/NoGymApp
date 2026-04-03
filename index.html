@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>No Gym app - Tu Plan Inteligente</title>
+    <!-- Configuración PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a192f">
+    <link rel="apple-touch-icon" href="assets/img_stretch1.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW refutado: ', err));
+            });
+        }
+    </script>
+    <div class="background-animation"></div>
+    
+    <div class="app-container">
+        <header id="main-header">
+            <div style="display:flex; align-items:center;">
+                <h1>No Gym<span> app</span></h1>
+            </div>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <div id="header-stats-btn" class="hidden" style="cursor:pointer; font-size:1.5rem;" title="Mis Avances">📈</div>
+                <div id="header-community-btn" class="hidden" style="cursor:pointer; font-size:1.5rem;" title="Comunidad">💬</div>
+                <div class="header-actions hidden" id="header-profile-btn" style="cursor:pointer;" title="Abrir Perfil">
+                    <img src="https://ui-avatars.com/api/?name=U&background=0a192f&color=00e5ff" id="nav-avatar" alt="Perfil" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #00e5ff; object-fit: cover;">
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- Form Section -->
+            <section id="form-section" class="glass-card active">
+                <h2>Crea tu perfil de entrenamiento</h2>
+                <form id="workout-form">
+                    
+                    <div style="display:flex; gap:15px; align-items:center; margin-bottom: 1.5rem;">
+                        <div class="signup-img-container" style="position:relative; width:80px; height:80px; flex-shrink:0;">
+                            <img src="https://ui-avatars.com/api/?name=New&background=0a192f&color=00e5ff" id="signup-profile-img" style="width:100%; height:100%; border-radius:50%; object-fit:cover; border:2px solid var(--turquoise);">
+                            <label for="signup-upload-photo" style="position:absolute; bottom:-5px; right:-5px; background:var(--turquoise); width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#000; font-size:14px; box-shadow:0 0 5px rgba(0,0,0,0.5);">📷</label>
+                            <input type="file" id="signup-upload-photo" accept="image/*" hidden>
+                        </div>
+                        <div class="input-group" style="flex:1; margin-bottom:0;">
+                            <label for="fullname">¿Cuál es tu nombre?</label>
+                            <input type="text" id="fullname" name="fullname" required placeholder="Ingresa tu nombre o apodo">
+                        </div>
+                    </div>
+
+                    <div class="inputs-row" style="margin-bottom: 1rem;">
+                        <div class="input-group">
+                            <label for="gender">Género</label>
+                            <select id="gender" name="gender" required>
+                                <option value="" disabled selected>Seleccione</option>
+                                <option value="hombre">Hombre</option>
+                                <option value="mujer">Mujer</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="age">Edad</label>
+                            <input type="number" id="age" name="age" required min="10" max="100" placeholder="Ej. 28">
+                        </div>
+                    </div>
+                    
+                    <div class="inputs-row">
+                        <div class="input-group">
+                            <label for="height">Altura (cm)</label>
+                            <input type="number" id="height" name="height" required min="100" max="250" placeholder="Ej. 170">
+                        </div>
+                        <div class="input-group">
+                            <label for="weight">Peso (kg)</label>
+                            <input type="number" id="weight" name="weight" required min="30" max="250" placeholder="Ej. 70">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="fitness-level">Estado Físico Actual</label>
+                        <select id="fitness-level" name="fitness-level" required>
+                            <option value="" disabled selected>Selecciona tu nivel</option>
+                            <option value="principiante">Principiante</option>
+                            <option value="intermedio">Intermedio</option>
+                            <option value="avanzado">Avanzado</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="lifestyle">💼 Ritmo de Vida (Horas sentado)</label>
+                        <select id="lifestyle" name="lifestyle" required>
+                            <option value="" disabled selected>Selecciona tu dinámica diaria</option>
+                            <option value="sedentario">Sedentario (Trabajo de oficina, +8h sentado)</option>
+                            <option value="mixto">Mixto (Estudiante/Mixto, algo de movimiento)</option>
+                            <option value="activo">Activo (Trabajo físico, caminatas diarias)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Condiciones Médicas Importantes</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px;">
+                            <label class="checkbox-container">Hipertensión
+                                <input type="checkbox" name="health" value="hipertension">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="checkbox-container">Diabetes
+                                <input type="checkbox" name="health" value="diabetes">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="checkbox-container">Lesión en Rodillas
+                                <input type="checkbox" name="health" value="rodillas">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="checkbox-container">Problemas Lumbar/Espalda
+                                <input type="checkbox" name="health" value="espalda">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="checkbox-container">Asma / Fatiga Fácil
+                                <input type="checkbox" name="health" value="asma">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="checkbox-container">Lesión de Hombros
+                                <input type="checkbox" name="health" value="hombros">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="checkbox-container">Artritis / Articulaciones
+                                <input type="checkbox" name="health" value="articulaciones">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <h3 class="section-subtitle">Selecciona tu Contextura Física actual</h3>
+                    <p class="section-desc">Ayuda a la IA a definir los impactos y variaciones.</p>
+                    <div class="body-type-grid">
+                        <label class="body-card">
+                            <input type="radio" name="body-type" value="delgado" required>
+                            <div class="body-content">
+                                <svg viewBox="0 0 24 24" class="silhouette skinny">
+                                    <path d="M12 2C10.9 2 10 2.9 10 4C10 5.1 10.9 6 12 6C13.1 6 14 5.1 14 4C14 2.9 13.1 2 12 2ZM8 22L9.5 13L7 11V7H17V11L14.5 13L16 22H13.5L12 16L10.5 22H8Z" fill="currentColor"/>
+                                </svg>
+                                <span>Delgado</span>
+                            </div>
+                        </label>
+                        <label class="body-card">
+                            <input type="radio" name="body-type" value="promedio">
+                            <div class="body-content">
+                                <svg viewBox="0 0 24 24" class="silhouette average">
+                                    <path d="M12 2C10.9 2 10 2.9 10 4C10 5.1 10.9 6 12 6C13.1 6 14 5.1 14 4C14 2.9 13.1 2 12 2ZM8 22L9.5 13L7 11V7H17V11L14.5 13L16 22H13.5L12 16L10.5 22H8Z" fill="currentColor"/>
+                                </svg>
+                                <span>Promedio</span>
+                            </div>
+                        </label>
+                        <label class="body-card">
+                            <input type="radio" name="body-type" value="falso-delgado">
+                            <div class="body-content">
+                                <svg viewBox="0 0 24 24" class="silhouette">
+                                    <path d="M12 2C10.9 2 10 2.9 10 4C10 5.1 10.9 6 12 6C13.1 6 14 5.1 14 4C14 2.9 13.1 2 12 2ZM8 22L9.5 13L7 11V7H17V11L14.5 13L16 22H13.5L12 16L10.5 22H8Z" fill="currentColor"/>
+                                </svg>
+                                <span>Ligero Sobrepeso (Con barriga)</span>
+                            </div>
+                        </label>
+                        <label class="body-card">
+                            <input type="radio" name="body-type" value="robusto">
+                            <div class="body-content">
+                                <svg viewBox="0 0 24 24" class="silhouette robust">
+                                    <path d="M12 2C10.9 2 10 2.9 10 4C10 5.1 10.9 6 12 6C13.1 6 14 5.1 14 4C14 2.9 13.1 2 12 2ZM8 22L9.5 13L7 11V7H17V11L14.5 13L16 22H13.5L12 16L10.5 22H8Z" fill="currentColor"/>
+                                </svg>
+                                <span>Robusto / Obesidad</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="input-group" style="margin-top: 1.5rem;">
+                        <label for="time">Tiempo disponible diario (min)</label>
+                        <input type="number" id="time" name="time" required min="15" max="180" placeholder="Ej. 45">
+                    </div>
+
+                    <h3 class="section-subtitle">¿Qué tienes disponible para entrenar?</h3>
+                    <p class="section-desc">Selecciona el equipo con el que cuentas (puedes dejar en blanco para peso corporal).</p>
+                    
+                    <div class="equipment-grid">
+                        <!-- Categoria 1: Pesas -->
+                        <div class="eq-category">
+                            <h4>🏋️ Pesas Libres</h4>
+                            <label class="checkbox-container">Pesas Ligeras (1 - 5 kg)
+                                <input type="checkbox" name="equip" value="pesas-ligeras">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="checkbox-container">Pesas Medias (5 - 15 kg)
+                                <input type="checkbox" name="equip" value="pesas-medias">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="checkbox-container">Pesas Pesadas (+15 kg)
+                                <input type="checkbox" name="equip" value="pesas-pesadas">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="checkbox-container">Bandas Elásticas
+                                <input type="checkbox" name="equip" value="bandas">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+
+                        <!-- Categoria 2: Cardio -->
+                        <div class="eq-category">
+                            <h4>🚴 Máquinas Cardio</h4>
+                            <label class="checkbox-container">Bicicleta Estática
+                                <input type="checkbox" name="equip" value="bici">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="checkbox-container">Caminadora
+                                <input type="checkbox" name="equip" value="caminadora">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="checkbox-container">Elíptica
+                                <input type="checkbox" name="equip" value="eliptica">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+
+                        <!-- Categoria 3: Casa -->
+                        <div class="eq-category">
+                            <h4>🪑 Elementos de Casa</h4>
+                            <label class="checkbox-container">Silla firme o Banco
+                                <input type="checkbox" name="equip" value="silla">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="checkbox-container">Gradas o Escaleras
+                                <input type="checkbox" name="equip" value="gradas">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label class="checkbox-container">Mochila c/ peso (Libros/Agua)
+                                <input type="checkbox" name="equip" value="mochila">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="primary-btn">¡Vamos a entrenar!</button>
+                </form>
+            </section>
+
+            <!-- Loading Section -->
+            <section id="loading-section" class="glass-card hidden">
+                <div class="loader"></div>
+                <h2 id="loading-text">Planificando rutinas...</h2>
+                <p>Estructurando día por día para evitar lesiones.</p>
+            </section>
+
+            <!-- Daily Dashboard Section -->
+            <section id="dashboard-section" class="glass-card hidden">
+                <div class="dashboard-header">
+                    <h2 id="current-day-title">Día 1: Adaptación</h2>
+                    <span class="day-badge">¡Hoy es tu día!</span>
+                </div>
+                
+                <p class="dashboard-desc">Estos son los ejercicios de tu sesión de hoy:</p>
+                <div id="daily-exercise-list" class="exercises-preview">
+                    <!-- Lista inyectada por JS -->
+                </div>
+
+                <div class="dashboard-actions">
+                    <button id="start-workout-btn" class="primary-btn pulse-btn">▶ Iniciar Entrenamiento de Hoy</button>
+                    <button id="reset-btn" class="secondary-btn">Configuración</button>
+                </div>
+            </section>
+
+            <!-- Exercise Player Section -->
+            <section id="player-section" class="player-card hidden">
+                <div class="player-top-bar">
+                    <button id="close-player-btn" class="icon-btn">✖ Salir</button>
+                    <span id="player-progress">Ejercicio 1 de 5</span>
+                </div>
+
+                <div class="exercise-visual">
+                    <!-- Animación de 2 frames (Inicio y Fin) -->
+                    <img id="visual-frame-1" class="anim-frame active" src="" alt="Posición Inicial">
+                    <img id="visual-frame-2" class="anim-frame" src="" alt="Posición Final">
+                    <div id="visual-loading" class="visual-loading">Cargando...</div>
+                </div>
+
+                <h2 id="exercise-name" class="exercise-name">Calentamiento Articular</h2>
+                
+                <div class="exercise-tips">
+                    <p id="exercise-desc" style="font-size: 1.5rem; font-weight: bold; line-height: 1.2; text-align: center; margin: 10px 0;">Mantén la espalda recta. No flexiones de más las rodillas.</p>
+                </div>
+
+                <div class="timer-container">
+                    <div class="progress-bar-bg" style="width: 100%; height: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-bottom: 5px;">
+                        <div id="exercise-progress-fill" style="width: 0%; height: 100%; background: var(--turquoise); transition: width 1s linear;"></div>
+                    </div>
+                    <div id="exercise-timer" class="timer-display" style="font-size: 1rem; color: var(--text-sec);">00:30</div>
+                    <div class="timer-controls">
+                        <button id="timer-toggle-btn" class="primary-btn">Comenzar</button>
+                        <button id="timer-skip-btn" class="secondary-btn">Siguiente ⏭</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Completion Section -->
+            <section id="completion-section" class="glass-card hidden">
+                <div class="completion-content">
+                    <div class="trophy-icon">🏆</div>
+                    <h2>¡Felicidades!</h2>
+                    <p>Has completado el entrenamiento de hoy con éxito.</p>
+                    
+                    <!-- Nutrition Plan Block -->
+                    <div class="nutrition-card">
+                        <h3>🍎 Tu Plan de Alimentación Estratégico</h3>
+                        <p id="nutrition-text">Calculando tus requerimientos...</p>
+                    </div>
+
+                    <p class="completion-subtext">Tu cuerpo se está adaptando. Descansa, hidrátate bien y ¡te esperamos mañana para tu siguiente reto!</p>
+                    <button id="complete-day-btn" class="primary-btn">Aceptar y Guardar Progreso</button>
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profile-section" class="glass-card hidden">
+                <button id="close-profile-btn" class="close-btn" style="position:absolute; top:20px; right:20px; background:transparent; border:none; color:var(--text-sec); font-size:1.2rem; cursor:pointer;">✖</button>
+                <div class="profile-header">
+                    <div class="profile-img-container">
+                        <img src="https://ui-avatars.com/api/?name=US&background=0a192f&color=00e5ff" id="main-profile-img" alt="Perfil">
+                        <label for="upload-photo" class="upload-btn">📷 Cambiar</label>
+                        <input type="file" id="upload-photo" accept="image/*" hidden>
+                    </div>
+                    <h2 id="profile-name">Atleta Activo</h2>
+                    <p class="profile-imc" id="profile-imc">Tu IMC: --</p>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-box"><span>Peso</span><strong id="p-weight">--</strong></div>
+                    <div class="stat-box"><span>Altura</span><strong id="p-height">--</strong></div>
+                    <div class="stat-box"><span>Edad</span><strong id="p-age">--</strong></div>
+                    <div class="stat-box"><span>Nivel</span><strong id="p-lvl">--</strong></div>
+                </div>
+
+                <div class="profile-details-list">
+                    <p><strong>Contextura:</strong> <span id="p-body">--</span></p>
+                    <p><strong>Condiciones Médicas:</strong> <span id="p-health">--</span></p>
+                </div>
+                
+                <button id="edit-profile-btn" class="secondary-btn" style="margin-top:20px;">Actualizar Mis Datos</button>
+            </section>
+
+            <!-- Community Section -->
+            <section id="community-section" class="glass-card hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h2>Comunidad No Gym</h2>
+                    <button id="close-community-btn" class="close-btn" style="position:static; background:transparent; border:none; color:var(--text-sec); font-size:1.2rem; cursor:pointer;">✖</button>
+                </div>
+                
+                <div id="community-feed" class="community-feed">
+                    <div class="post-card">
+                        <div class="post-header">
+                            <span class="mock-avatar">M</span>
+                            <div>
+                                <strong>Miguel A.</strong>
+                                <small>Hace 2 horas</small>
+                            </div>
+                        </div>
+                        <p>¡El plan adaptativo para mi lesión de rodilla es genial! Por fin pude hacer sentadillas sin dolor en la articulación utilizando solamente una silla. 💪</p>
+                    </div>
+                    
+                    <div class="post-card">
+                        <div class="post-header">
+                            <span class="mock-avatar">L</span>
+                            <div>
+                                <strong>Laura S.</strong>
+                                <small>Hace 5 horas</small>
+                            </div>
+                        </div>
+                        <p>Día 1 completado. Ufff los saltos te dejan sin aliento pero me gané mi plan nutricional. Voy por las metas de este mes. ¡Súper recomendado!</p>
+                    </div>
+                </div>
+                
+                <div class="new-post-box">
+                    <textarea id="community-msg" placeholder="Comparte tu experiencia o recomendación..." rows="3"></textarea>
+                    <button id="post-msg-btn" class="primary-btn pulse-btn" style="padding: 10px; margin-top:10px;">Publicar 🚀</button>
+                </div>
+            </section>
+
+            <!-- Statistics / Advances Section -->
+            <section id="statistics-section" class="glass-card hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h2>📈 Mis Avances y Metas</h2>
+                    <button id="close-stats-btn" class="close-btn" style="position:static; background:transparent; border:none; color:var(--text-sec); font-size:1.2rem; cursor:pointer;">✖ Volver</button>
+                </div>
+                
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1.5rem; text-align:center;">
+                    <div class="stat-box" style="width:100%; border-color:rgba(0,229,255,0.4);">
+                        <span style="font-size:0.8rem;">Calorías Quemadas Est. (Mensual)</span>
+                        <strong style="color:var(--turquoise); font-size:1.3rem;">12,500 kcal</strong>
+                    </div>
+                    <div class="stat-box" style="width:100%;">
+                        <span style="font-size:0.8rem;">Fuerza Ganada Proyectada</span>
+                        <strong style="color:var(--turquoise); font-size:1.3rem;">+ 18%</strong>
+                    </div>
+                    <div class="stat-box" style="width:100%;">
+                        <span style="font-size:0.8rem;">Mejora Cardio (VO2 Max)</span>
+                        <strong style="color:var(--turquoise); font-size:1.3rem;">+ 12%</strong>
+                    </div>
+                    <div class="stat-box" style="width:100%; border-color:var(--turquoise);">
+                        <span style="font-size:0.8rem;">Días Consistentes (Racha)</span>
+                        <strong style="color:var(--turquoise); font-size:1.3rem;">28 / 30</strong>
+                    </div>
+                </div>
+                
+                <div style="background:rgba(0,0,0,0.3); padding:1rem; border-radius:8px; border-left: 4px solid var(--turquoise);">
+                    <h4 style="margin-bottom:0.5rem; color:#fff;">🎯 Logro Esperado a 30 días</h4>
+                    <p style="font-size:0.9rem; color:var(--text-sec); line-height:1.5;">Si no interrumpes el programa <strong>No Gym</strong>, estarás construyendo un hábito irrompible. Deberías observar una reducción de grasa corporal del <strong style="color:#fff;">3-5%</strong> y una mejora sustancial en tu postura y resistencia cardiovascular diaria. ¡Sigue así!</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
