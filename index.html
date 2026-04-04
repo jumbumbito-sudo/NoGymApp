@@ -346,7 +346,7 @@
                 </div>
                 
                 <button id="edit-profile-btn" class="secondary-btn" style="margin-top:20px; width:100%;">Actualizar Mis Datos</button>
-                <button id="logout-btn-pwa" class="danger-btn" style="width:100%; margin-top:15px; padding:12px; cursor:pointer;">Cerrar Sesión</button>
+                <button id="logout-btn-pwa" class="danger-btn" style="width:100%; margin-top:15px; padding:12px; cursor:pointer; border-radius: 20px;" onclick="if(confirm('¿Quieres cerrar sesión?')){ localStorage.removeItem('nogym_data'); window.location.reload(); }">Cerrar Sesión</button>
             </section>
 
             <!-- Community Section -->
@@ -421,6 +421,6 @@
         </main>
     </div>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=1.1"></script>
 </body>
 </html>
