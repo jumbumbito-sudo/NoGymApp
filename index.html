@@ -131,7 +131,28 @@
                                 <input type="checkbox" name="health" value="articulaciones">
                                 <span class="checkmark"></span>
                             </label>
+                            <label class="checkbox-container" style="border: 1px solid var(--turquoise); border-radius: 8px; padding: 4px 10px 4px 28px; margin-top: 5px; background: rgba(0,229,255,0.05);">
+                                👨‍🦳 <strong>Programa de Movilidad (Gerontológico)</strong>
+                                <input type="checkbox" id="mobility-toggle" name="mobility-active" value="true">
+                                <span class="checkmark" style="top:5px; left:5px;"></span>
+                            </label>
                         </div>
+                    </div>
+
+                    <!-- Specialized Mobility Menu -->
+                    <div id="mobility-menu" class="hidden-menu" style="margin-top: 15px; background: rgba(0, 0, 0, 0.2); padding: 15px; border-radius: 12px; border: 1px dashed var(--turquoise); display: none;">
+                        <h4 style="color: var(--turquoise); font-size: 0.95rem; margin-bottom: 10px;">Selecciona el Objetivo Terapéutico:</h4>
+                        <div class="input-group" style="margin-bottom: 0;">
+                            <select id="mobility-type" name="mobility-type">
+                                <option value="" disabled selected>Selecciona enfoque...</option>
+                                <option value="balance">Equilibrio y Prevención de Caídas</option>
+                                <option value="artrosis">Alivio de Rigidez Articular (Artrosis/Artritis)</option>
+                                <option value="sarcopenia">Fortalecimiento Funcional (Ganar masa muscular)</option>
+                                <option value="silla">Ejercicios en Silla (Movilidad Muy Reducida)</option>
+                                <option value="postop">Post-Operatorio General (Fortalecer Cadera/Rodilla)</option>
+                            </select>
+                        </div>
+                        <p style="font-size: 0.75rem; color: var(--text-sec); margin-top: 8px;">*Este programa sustituye el entrenamiento estándar por uno terapéutico de bajo impacto supervisado por nuestra IA Gerontológica.</p>
                     </div>
 
                     <h3 class="section-subtitle">Selecciona tu Contextura Física actual</h3>
@@ -346,7 +367,7 @@
                 </div>
                 
                 <button id="edit-profile-btn" class="secondary-btn" style="margin-top:20px; width:100%;">Actualizar Mis Datos</button>
-                <button id="logout-btn-pwa" class="danger-btn" style="width:100%; margin-top:15px; padding:12px; cursor:pointer; border-radius: 20px;" onclick="if(confirm('¿Quieres cerrar sesión?')){ localStorage.removeItem('nogym_data'); window.location.reload(); }">Cerrar Sesión</button>
+                <button id="logout-btn-pwa" class="danger-btn" style="width:100%; margin-top:15px; padding:12px; cursor:pointer;">Cerrar Sesión</button>
             </section>
 
             <!-- Community Section -->
