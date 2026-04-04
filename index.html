@@ -274,6 +274,7 @@
                 <div class="player-top-bar">
                     <button id="close-player-btn" class="icon-btn">✖ Salir</button>
                     <span id="player-progress">Ejercicio 1 de 5</span>
+                    <button id="audio-toggle-btn" class="icon-btn" style="font-size: 1.2rem;">🔊</button>
                 </div>
 
                 <div class="exercise-visual">
@@ -393,20 +394,20 @@
                 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1.5rem; text-align:center;">
                     <div class="stat-box" style="width:100%; border-color:rgba(0,229,255,0.4);">
-                        <span style="font-size:0.8rem;">Calorías Quemadas Est. (Mensual)</span>
-                        <strong style="color:var(--turquoise); font-size:1.3rem;">12,500 kcal</strong>
+                        <span style="font-size:0.8rem;">Calorías Quemadas Est. (Total)</span>
+                        <strong id="stat-calories" style="color:var(--turquoise); font-size:1.3rem;">0 kcal</strong>
                     </div>
                     <div class="stat-box" style="width:100%;">
-                        <span style="font-size:0.8rem;">Fuerza Ganada Proyectada</span>
-                        <strong style="color:var(--turquoise); font-size:1.3rem;">+ 18%</strong>
+                        <span style="font-size:0.8rem;">Entrenamientos Completados</span>
+                        <strong id="stat-workouts" style="color:var(--turquoise); font-size:1.3rem;">0</strong>
                     </div>
                     <div class="stat-box" style="width:100%;">
-                        <span style="font-size:0.8rem;">Mejora Cardio (VO2 Max)</span>
-                        <strong style="color:var(--turquoise); font-size:1.3rem;">+ 12%</strong>
+                        <span style="font-size:0.8rem;">Minutos Entrenados</span>
+                        <strong id="stat-minutes" style="color:var(--turquoise); font-size:1.3rem;">0 min</strong>
                     </div>
                     <div class="stat-box" style="width:100%; border-color:var(--turquoise);">
                         <span style="font-size:0.8rem;">Días Consistentes (Racha)</span>
-                        <strong style="color:var(--turquoise); font-size:1.3rem;">28 / 30</strong>
+                        <strong id="stat-streak" style="color:var(--turquoise); font-size:1.3rem;">0</strong>
                     </div>
                 </div>
                 
