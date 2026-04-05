@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nogym-v2';
+const CACHE_NAME = 'nogym-v3';
 const urlsToCache = [
   './',
   './index.html',

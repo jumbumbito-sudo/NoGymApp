@@ -22,14 +22,14 @@ body.theme-pro {
 }
 
 body.theme-elderly {
-    --primary-blue: #F0F4F8; /* Pastel Blue/Grey */
-    --second-blue: #FFFFFF;
-    --light-blue: #E1E8F0;
-    --turquoise: #4A90E2; /* Soft blue */
-    --dark-turquoise: #357ABD;
-    --text-main: #2C3E50;
-    --text-sec: #5D6D7E;
-    --font-multiplier: 1.25;
+    --primary-blue: #1A2B3C; /* Azul profundo pero suave (más amigable que negro puro) */
+    --second-blue: #2C3E50;
+    --light-blue: #3E4F63;
+    --turquoise: #A1C4FD; /* Azul pastel claro para acentos */
+    --dark-turquoise: #FFFFFF; /* Blanco para máxima legibilidad */
+    --text-main: #FFFFFF;
+    --text-sec: #D4E2F2;
+    --font-multiplier: 1.35; /* Un poco más grande para mejor lectura */
 }
 
 * {
