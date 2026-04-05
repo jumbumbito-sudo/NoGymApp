@@ -8,12 +8,35 @@
     --text-sec: #8892B0;
     --error: #FF3366;
     --success: #00E676;
+    --font-multiplier: 1;
+}
+
+body.theme-pro {
+    --primary-blue: #000000;
+    --second-blue: #050505;
+    --light-blue: #111111;
+    --turquoise: #FFFFFF; /* Sleek White/Silver on Black */
+    --dark-turquoise: #888888;
+    --text-main: #FFFFFF;
+    --text-sec: #AAAAAA;
+}
+
+body.theme-elderly {
+    --primary-blue: #F0F4F8; /* Pastel Blue/Grey */
+    --second-blue: #FFFFFF;
+    --light-blue: #E1E8F0;
+    --turquoise: #4A90E2; /* Soft blue */
+    --dark-turquoise: #357ABD;
+    --text-main: #2C3E50;
+    --text-sec: #5D6D7E;
+    --font-multiplier: 1.25;
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    font-size: calc(1rem * var(--font-multiplier, 1));
 }
 
 body {
@@ -106,7 +129,7 @@ header p {
 .glass-card h2 {
     color: var(--turquoise);
     margin-bottom: 1.5rem;
-    font-size: 1.5rem;
+    font-size: calc(1.5rem * var(--font-multiplier, 1));
     border-bottom: 1px solid rgba(0, 229, 255, 0.2);
     padding-bottom: 0.5rem;
 }
@@ -357,6 +380,34 @@ header p {
     border-color: var(--turquoise);
     color: var(--turquoise);
     background: rgba(0, 229, 255, 0.05);
+}
+
+.danger-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 1.5rem;
+    background: transparent;
+    border: 1.5px solid rgba(255, 51, 102, 0.3);
+    color: var(--error);
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.danger-btn:hover {
+    border-color: var(--error);
+    background: rgba(255, 51, 102, 0.1);
+    box-shadow: 0 0 20px rgba(255, 51, 102, 0.15);
+    transform: translateY(-1px);
+}
+
+.danger-btn:active {
+    transform: translateY(1px);
 }
 
 .icon-btn {

@@ -2,8 +2,11 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const ASSETS_DIR = path.join(__dirname, 'assets');
+const ASSETS_DIR = path.join(__dirname, 'assets', 'v2');
 
+if (!fs.existsSync(path.join(__dirname, 'assets'))) {
+    fs.mkdirSync(path.join(__dirname, 'assets'));
+}
 if (!fs.existsSync(ASSETS_DIR)) {
     fs.mkdirSync(ASSETS_DIR);
 }
@@ -17,8 +20,15 @@ function getPrompt(genderStr, excerciseStr) {
 
 const imagesToGenerate = [
     // --- FEMALE (Mujer) ---
-    { id: 'img_f_warm1', p: getPrompt('woman', 'doing a shoulder stretch, standing straight, very rigid side profile') },
-    { id: 'img_f_warm2', p: getPrompt('woman', 'doing a torso twist shoulder stretch, side profile') },
+    { id: 'img_f_warm_head1', p: getPrompt('woman', 'standing straight, head tilted forward, side profile') },
+    { id: 'img_f_warm_head2', p: getPrompt('woman', 'standing straight, head tilted backward, side profile') },
+    { id: 'img_f_warm_arms1', p: getPrompt('woman', 'standing straight, rotating both arms in large circles, side profile') },
+    { id: 'img_f_warm_arms2', p: getPrompt('woman', 'standing straight, arms extended horizontally, side profile') },
+    { id: 'img_f_warm_torso1', p: getPrompt('woman', 'standing straight, twisting torso to the right, side profile') },
+    { id: 'img_f_warm_torso2', p: getPrompt('woman', 'standing straight, twisting torso to the left, side profile') },
+    { id: 'img_f_warm_legs1', p: getPrompt('woman', 'standing straight, lifting one knee high, side profile') },
+    { id: 'img_f_warm_legs2', p: getPrompt('woman', 'standing straight, lifting other knee high, side profile') },
+    
     { id: 'img_f_jacks1', p: getPrompt('woman', 'standing perfectly straight, arms down, simple side profile') },
     { id: 'img_f_jacks2', p: getPrompt('woman', 'jumping jack pose in the air, legs apart, arms up, side profile') },
     { id: 'img_f_plank1', p: getPrompt('woman', 'doing a perfect straight forearm plank on the floor, side view') },
@@ -39,10 +49,35 @@ const imagesToGenerate = [
     // Novedades Mujer
     { id: 'img_f_escoba1', p: getPrompt('woman', 'standing straight holding a broomstick horizontally behind neck, side profile') },
     { id: 'img_f_escoba2', p: getPrompt('woman', 'twisting torso holding a broomstick horizontally behind neck, side profile') },
+    { id: 'img_f_backpack1', p: getPrompt('woman', 'standing straight wearing a heavy backpack, side profile') },
+    { id: 'img_f_backpack2', p: getPrompt('woman', 'doing a deep squat wearing a heavy backpack, side profile') },
+    { id: 'img_f_backpack_row1', p: getPrompt('woman', 'bending forward holding a backpack by the top handle, arms extended down, side profile') },
+    { id: 'img_f_backpack_row2', p: getPrompt('woman', 'bending forward pulling a backpack to her chest, one arm row, side profile') },
+    { id: 'img_f_stairs1', p: getPrompt('woman', 'stepping up onto a square platform (stair step), right foot up, side profile') },
+    { id: 'img_f_stairs2', p: getPrompt('woman', 'stepping up onto a square platform (stair step), left foot up, balanced posture, side profile') },
+    { id: 'img_f_bands1', p: getPrompt('woman', 'standing straight pulling an elastic resistance band outwards with both hands, side profile') },
+    { id: 'img_f_bands2', p: getPrompt('woman', 'standing straight pulling an elastic resistance band upwards to her chest, side profile') },
+    { id: 'img_f_gero_warm1', p: getPrompt('elderly woman', 'sitting on a chair, rotating her shoulders gently, side profile') },
+    { id: 'img_f_gero_warm2', p: getPrompt('elderly woman', 'sitting on a chair, tilted neck stretch, side profile') },
+    { id: 'img_f_gero_legs1', p: getPrompt('elderly woman', 'sitting on a chair, feet flat on floor, side profile') },
+    { id: 'img_f_gero_legs2', p: getPrompt('elderly woman', 'sitting on a chair, one leg extended fully forward, side profile') },
+    { id: 'img_f_gero_sitstand1', p: getPrompt('elderly woman', 'sitting on the edge of a chair, arms crossed on chest, side profile') },
+    { id: 'img_f_gero_sitstand2', p: getPrompt('elderly woman', 'halfway standing up from a chair, side profile') },
+    { id: 'img_f_gero_balance1', p: getPrompt('elderly woman', 'standing straight holding a chair back for support, side profile') },
+    { id: 'img_f_gero_balance2', p: getPrompt('elderly woman', 'standing on one leg while holding a chair back, side profile') },
+    { id: 'img_f_gero_stretch1', p: getPrompt('elderly woman', 'sitting on a chair, leaning back with hands on lower back, side profile') },
+    { id: 'img_f_gero_stretch2', p: getPrompt('elderly woman', 'sitting on a chair, reaching one arm across chest, side profile') },
 
     // --- MALE (Hombre) ---
-    { id: 'img_m_warm1', p: getPrompt('man', 'doing a shoulder stretch, standing straight, very rigid side profile') },
-    { id: 'img_m_warm2', p: getPrompt('man', 'doing a torso twist shoulder stretch, side profile') },
+    { id: 'img_m_warm_head1', p: getPrompt('man', 'standing straight, head tilted forward, side profile') },
+    { id: 'img_m_warm_head2', p: getPrompt('man', 'standing straight, head tilted backward, side profile') },
+    { id: 'img_m_warm_arms1', p: getPrompt('man', 'standing straight, rotating both arms in large circles, side profile') },
+    { id: 'img_m_warm_arms2', p: getPrompt('man', 'standing straight, arms extended horizontally, side profile') },
+    { id: 'img_m_warm_torso1', p: getPrompt('man', 'standing straight, twisting torso to the right, side profile') },
+    { id: 'img_m_warm_torso2', p: getPrompt('man', 'standing straight, twisting torso to the left, side profile') },
+    { id: 'img_m_warm_legs1', p: getPrompt('man', 'standing straight, lifting one knee high, side profile') },
+    { id: 'img_m_warm_legs2', p: getPrompt('man', 'standing straight, lifting other knee high, side profile') },
+    
     { id: 'img_m_jacks1', p: getPrompt('man', 'standing perfectly straight, arms down, simple side profile') },
     { id: 'img_m_jacks2', p: getPrompt('man', 'jumping jack pose in the air, legs apart, arms up, side profile') },
     { id: 'img_m_plank1', p: getPrompt('man', 'doing a perfect straight forearm plank on the floor, side view') },
@@ -57,12 +92,30 @@ const imagesToGenerate = [
     { id: 'img_m_treadmill2', p: getPrompt('man', 'walking on a minimal flat treadmill, left leg forward, side view') },
     { id: 'img_m_bike1', p: getPrompt('man', 'riding an exercise stationary bike, side profile') },
     { id: 'img_m_bike2', p: getPrompt('man', 'riding an exercise stationary bike, side profile') },
-    { id: 'img_m_stretch1', p: getPrompt('man', 'standing straight touching knees gently, side profile') },
-    { id: 'img_m_stretch2', p: getPrompt('man', 'bending down touching the toes, flexibility stretch, side profile') },
+    { id: 'img_m_warm_legs1', p: getPrompt('man', 'standing straight touching knees gently, side profile') },
+    { id: 'img_m_warm_legs2', p: getPrompt('man', 'bending down touching the toes, flexibility stretch, side profile') },
     
     // Novedades Hombre
     { id: 'img_m_escoba1', p: getPrompt('man', 'standing straight holding a broomstick horizontally behind neck, side profile') },
-    { id: 'img_m_escoba2', p: getPrompt('man', 'twisting torso holding a broomstick horizontally behind neck, side profile') }
+    { id: 'img_m_escoba2', p: getPrompt('man', 'twisting torso holding a broomstick horizontally behind neck, side profile') },
+    { id: 'img_m_backpack1', p: getPrompt('man', 'standing straight wearing a heavy backpack, side profile') },
+    { id: 'img_m_backpack2', p: getPrompt('man', 'doing a deep squat wearing a heavy backpack, side profile') },
+    { id: 'img_m_backpack_row1', p: getPrompt('man', 'bending forward holding a backpack by the top handle, arms extended down, side profile') },
+    { id: 'img_m_backpack_row2', p: getPrompt('man', 'bending forward pulling a backpack to his chest, one arm row, side profile') },
+    { id: 'img_m_stairs1', p: getPrompt('man', 'stepping up onto a square platform (stair step), right foot up, side profile') },
+    { id: 'img_m_stairs2', p: getPrompt('man', 'stepping up onto a square platform (stair step), left foot up, balanced posture, side profile') },
+    { id: 'img_m_bands1', p: getPrompt('man', 'standing straight pulling an elastic resistance band outwards with both hands, side profile') },
+    { id: 'img_m_bands2', p: getPrompt('man', 'standing straight pulling an elastic resistance band upwards to his chest, side profile') },
+    { id: 'img_m_gero_warm1', p: getPrompt('elderly man', 'sitting on a chair, rotating his shoulders gently, side profile') },
+    { id: 'img_m_gero_warm2', p: getPrompt('elderly man', 'sitting on a chair, tilted neck stretch, side profile') },
+    { id: 'img_m_gero_legs1', p: getPrompt('elderly man', 'sitting on a chair, feet flat on floor, side profile') },
+    { id: 'img_m_gero_legs2', p: getPrompt('elderly man', 'sitting on a chair, one leg extended fully forward, side profile') },
+    { id: 'img_m_gero_sitstand1', p: getPrompt('elderly man', 'sitting on the edge of a chair, arms crossed on chest, side profile') },
+    { id: 'img_m_gero_sitstand2', p: getPrompt('elderly man', 'halfway standing up from a chair, side profile') },
+    { id: 'img_m_gero_balance1', p: getPrompt('elderly man', 'standing straight holding a chair back for support, side profile') },
+    { id: 'img_m_gero_balance2', p: getPrompt('elderly man', 'standing on one leg while holding a chair back, side profile') },
+    { id: 'img_m_gero_stretch1', p: getPrompt('elderly man', 'sitting on a chair, leaning back with hands on lower back, side profile') },
+    { id: 'img_m_gero_stretch2', p: getPrompt('elderly man', 'sitting on a chair, reaching one arm across chest, side profile') }
 ];
 
 async function downloadImage(item) {

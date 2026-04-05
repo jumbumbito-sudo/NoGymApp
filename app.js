@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Statistics Elements
     const headerStatsBtn = document.getElementById('header-stats-btn');
     const closeStatsBtn = document.getElementById('close-stats-btn');
+    const logoutBtn = document.getElementById('logout-btn-pwa');
 
     // State Variables
     let currentDay = 1;
@@ -71,15 +72,54 @@ document.addEventListener('DOMContentLoaded', () => {
     let userProfile = {};
     let globalEquip = [];
     let globalHealth = [];
+    
+    // Stats variables
+    let stats = {
+        totalWorkouts: 0,
+        totalCalories: 0,
+        totalMinutes: 0,
+        streak: 0,
+        lastWorkoutDate: null,
+        isAudioMuted: false
+    };
+
+    const audioToggleBtn = document.getElementById('audio-toggle-btn');
 
     function saveData() {
+        updateTheme(userProfile.age);
         const data = {
             userProfile,
             currentDay,
             globalEquip,
-            globalHealth
+            globalHealth,
+            stats
         };
         localStorage.setItem('nogym_data', JSON.stringify(data));
+    }
+
+    // Mobility Menu Toggle
+    const mobilityToggle = document.getElementById('mobility-toggle');
+    const mobilityMenu = document.getElementById('mobility-menu');
+    if (mobilityToggle) {
+        mobilityToggle.addEventListener('change', () => {
+            mobilityMenu.style.display = mobilityToggle.checked ? 'block' : 'none';
+        });
+    }
+
+    function updateTheme(age) {
+        document.body.classList.remove('theme-pro', 'theme-elderly');
+        const val = parseInt(age);
+        if (val >= 25 && val < 55) {
+            document.body.classList.add('theme-pro');
+        } else if (val >= 55) {
+            document.body.classList.add('theme-elderly');
+        }
+    }
+
+    // Age Input Listener for dynamic preview
+    const ageInput = document.getElementById('age');
+    if (ageInput) {
+        ageInput.addEventListener('input', (e) => updateTheme(e.target.value));
     }
 
     function loadData() {
@@ -92,11 +132,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentDay = data.currentDay || 1;
                     globalEquip = data.globalEquip || [];
                     globalHealth = data.globalHealth || [];
+                    stats = data.stats || stats;
 
                     dayTitle.textContent = `Día ${currentDay}: Progreso Activo`;
                     populateProfileView(globalHealth); 
+                    updateStatsUI();
                     currentRoutine = generateDailyRoutine(userProfile.lvl, globalEquip, userProfile.gender, globalHealth);
                     renderDashboard();
+                    updateAudioIcon();
 
                     // Pre-fill form just in case they edit profile
                     document.getElementById('fullname').value = userProfile.name;
@@ -140,7 +183,9 @@ document.addEventListener('DOMContentLoaded', () => {
             lvl: document.getElementById('fitness-level').value,
             lifestyle: document.getElementById('lifestyle').value,
             time: parseInt(document.getElementById('time').value) || 15,
-            bodyType: formData.get('body-type')
+            bodyType: formData.get('body-type'),
+            mobilityActive: formData.get('mobility-active') === 'true',
+            mobilityType: formData.get('mobility-type') || 'none'
         };
 
         if(!userProfile.bodyType) {
@@ -178,6 +223,15 @@ document.addEventListener('DOMContentLoaded', () => {
         headerProfileBtn.classList.add('hidden');
         switchView(profileSection, formSection);
     });
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            if(confirm("¿Estás seguro de que quieres cerrar sesión? Perderás tu racha y estadísticas actuales.")) {
+                localStorage.removeItem('nogym_data');
+                window.location.reload();
+            }
+        });
+    }
 
     // Image Upload
     function handleImageUpload(file) {
@@ -316,6 +370,27 @@ document.addEventListener('DOMContentLoaded', () => {
         timerToggleBtn.style.background = 'linear-gradient(135deg, var(--turquoise), var(--dark-turquoise))';
         timerToggleBtn.style.color = '#000';
         timerToggleBtn.style.border = 'none';
+
+        speak(`Siguiente ejercicio: ${ex.name}.`);
+    }
+
+    function speak(text) {
+        if (stats.isAudioMuted || !window.speechSynthesis) return;
+        window.speechSynthesis.cancel(); // Parar lo anterior
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'es-ES';
+        utterance.rate = 1.1;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    audioToggleBtn.addEventListener('click', () => {
+        stats.isAudioMuted = !stats.isAudioMuted;
+        updateAudioIcon();
+        saveData();
+    });
+
+    function updateAudioIcon() {
+        audioToggleBtn.textContent = stats.isAudioMuted ? '🔇' : '🔊';
     }
 
     function startAnimation() {
@@ -362,8 +437,12 @@ document.addEventListener('DOMContentLoaded', () => {
             currentRemainingTime--;
             updateTimerDisplay();
 
+            if (currentRemainingTime === 10) speak("Diez segundos.");
+            if (currentRemainingTime === 3) speak("3, 2, 1.");
+
             if (currentRemainingTime <= 0) {
                 pauseTimer();
+                speak("¡Tiempo! Descansa.");
                 setTimeout(nextExercise, 1000);
             }
         }, 1000);
@@ -405,8 +484,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function finishWorkout() {
+        const totalSecs = currentRoutine.reduce((acc, ex) => acc + (ex.duration || 0), 0);
+        const minutes = Math.round(totalSecs / 60);
+        const calories = minutes * 8; // Estimación simple: 8kcal por minuto
+
+        updateStats(calories, minutes);
         generateNutritionPlan();
+        speak(`¡Felicidades! Entrenamiento completado. Has quemado aproximadamente ${calories} calorías.`);
         switchView(playerSection, completionSection);
+    }
+
+    function updateStats(cals, mins) {
+        stats.totalWorkouts++;
+        stats.totalCalories += cals;
+        stats.totalMinutes += mins;
+
+        // Lógica de racha
+        const today = new Date().toDateString();
+        if (stats.lastWorkoutDate) {
+            const last = new Date(stats.lastWorkoutDate);
+            const diff = (new Date(today) - last) / (1000 * 60 * 60 * 24);
+            if (diff === 1) {
+                stats.streak++;
+            } else if (diff > 1) {
+                stats.streak = 1;
+            }
+        } else {
+            stats.streak = 1;
+        }
+        stats.lastWorkoutDate = today;
+        updateStatsUI();
+        saveData();
+    }
+
+    function updateStatsUI() {
+        document.getElementById('stat-calories').textContent = `${Math.round(stats.totalCalories)} kcal`;
+        document.getElementById('stat-workouts').textContent = stats.totalWorkouts;
+        document.getElementById('stat-minutes').textContent = `${stats.totalMinutes} min`;
+        document.getElementById('stat-streak').textContent = stats.streak;
     }
 
     function generateNutritionPlan() {
@@ -491,101 +606,128 @@ document.addEventListener('DOMContentLoaded', () => {
         const isAsma = health.includes('asma');
         const isHombro = health.includes('hombros');
 
-        // Solo usamos imagenes generadas (treadmill y weights se reutilizan)
+        // Todas las imágenes ahora apuntan a la carpeta v2 para renovación total
         const images = {
             mujer: {
-                warmupArms: ['assets/img_f_warm1.png', 'assets/img_f_warm2.png'],
-                warmupLegs: ['assets/img_f_stretch1.png', 'assets/img_f_stretch2.png'],
-                escoba: ['assets/img_f_escoba1.png', 'assets/img_f_escoba2.png'],
-                bike: ['assets/img_bike1.png', 'assets/img_bike2.png'],
-                eliptica: ['assets/img_treadmill1.png', 'assets/img_treadmill2.png'],
-                treadmill: ['assets/img_treadmill1.png', 'assets/img_treadmill2.png'],
-                jacks: ['assets/img_f_jacks1.png', 'assets/img_f_jacks2.png'],
-                weights: ['assets/img_weights1.png', 'assets/img_weights2.png'],
-                chair: ['assets/img_chair1.png', 'assets/img_chair2.png'],
-                mochila: ['assets/img_weights1.png', 'assets/img_weights2.png'], // Usa pesas
-                pushups: ['assets/img_pushups1.png', 'assets/img_pushups2.png'],
-                plank: ['assets/img_plank1.png', 'assets/img_plank2.png'],
-                stretch: ['assets/img_stretch1.png', 'assets/img_stretch2.png']
+                warmupHead: ['assets/v2/img_f_warm_head1.png', 'assets/v2/img_f_warm_head2.png'],
+                warmupArms: ['assets/v2/img_f_warm_arms1.png', 'assets/v2/img_f_warm_arms2.png'],
+                warmupTorso: ['assets/v2/img_f_warm_torso1.png', 'assets/v2/img_f_warm_torso2.png'],
+                warmupLegs: ['assets/v2/img_f_warm_legs1.png', 'assets/v2/img_f_warm_legs2.png'],
+                escoba: ['assets/v2/img_f_escoba1.png', 'assets/v2/img_f_escoba2.png'],
+                stairs: ['assets/v2/img_f_stairs1.png', 'assets/v2/img_f_stairs2.png'],
+                bike: ['assets/v2/img_f_bike1.png', 'assets/v2/img_f_bike2.png'],
+                eliptica: ['assets/v2/img_f_treadmill1.png', 'assets/v2/img_f_treadmill2.png'],
+                treadmill: ['assets/v2/img_f_treadmill1.png', 'assets/v2/img_f_treadmill2.png'],
+                jacks: ['assets/v2/img_f_jacks1.png', 'assets/v2/img_f_jacks2.png'],
+                weights: ['assets/v2/img_f_weights1.png', 'assets/v2/img_f_weights2.png'],
+                bands: ['assets/v2/img_f_bands1.png', 'assets/v2/img_f_bands2.png'],
+                chair: ['assets/v2/img_f_chair1.png', 'assets/v2/img_f_chair2.png'],
+                mochila: ['assets/v2/img_f_backpack1.png', 'assets/v2/img_f_backpack2.png'],
+                mochilaRow: ['assets/v2/img_f_backpack_row1.png', 'assets/v2/img_f_backpack_row2.png'],
+                pushups: ['assets/v2/img_f_pushups1.png', 'assets/v2/img_f_pushups2.png'],
+                plank: ['assets/v2/img_f_plank1.png', 'assets/v2/img_f_plank2.png'],
+                stretch: ['assets/v2/img_f_stretch1.png', 'assets/v2/img_f_stretch2.png'],
+                geroWarmup: ['assets/v2/img_f_gero_warm1.png', 'assets/v2/img_f_gero_warm2.png'],
+                geroLegs: ['assets/v2/img_f_gero_legs1.png', 'assets/v2/img_f_gero_legs2.png'],
+                geroSitStand: ['assets/v2/img_f_gero_sitstand1.png', 'assets/v2/img_f_gero_sitstand2.png'],
+                geroBalance: ['assets/v2/img_f_gero_balance1.png', 'assets/v2/img_f_gero_balance2.png'],
+                geroStretch: ['assets/v2/img_f_gero_stretch1.png', 'assets/v2/img_f_gero_stretch2.png']
             },
             hombre: {
-                warmupArms: ['assets/img_m_warm_arms1.png', 'assets/img_m_warm_arms2.png'],
-                warmupLegs: ['assets/img_m_warm_legs1.png', 'assets/img_m_warm_legs2.png'],
-                escoba: ['assets/img_m_escoba1.png', 'assets/img_m_escoba2.png'],
-                bike: ['assets/img_m_bike1.png', 'assets/img_m_bike2.png'],
-                eliptica: ['assets/img_treadmill1.png', 'assets/img_treadmill2.png'],
-                treadmill: ['assets/img_treadmill1.png', 'assets/img_treadmill2.png'],
-                jacks: ['assets/img_m_jacks1.png', 'assets/img_m_jacks2.png'],
-                weights: ['assets/img_m_weights1.png', 'assets/img_m_weights2.png'],
-                chair: ['assets/img_m_chair1.png', 'assets/img_m_chair2.png'],
-                mochila: ['assets/img_m_weights1.png', 'assets/img_m_weights2.png'],
-                pushups: ['assets/img_m_pushups1.png', 'assets/img_m_pushups2.png'],
-                plank: ['assets/img_m_plank1.png', 'assets/img_m_plank2.png'],
-                stretch: ['assets/img_m_warm_legs1.png', 'assets/img_m_warm_legs2.png']
+                warmupHead: ['assets/v2/img_m_warm_head1.png', 'assets/v2/img_m_warm_head2.png'],
+                warmupArms: ['assets/v2/img_m_warm_arms1.png', 'assets/v2/img_m_warm_arms2.png'],
+                warmupTorso: ['assets/v2/img_m_warm_torso1.png', 'assets/v2/img_m_warm_torso2.png'],
+                warmupLegs: ['assets/v2/img_m_warm_legs1.png', 'assets/v2/img_m_warm_legs2.png'],
+                escoba: ['assets/v2/img_m_escoba1.png', 'assets/v2/img_m_escoba2.png'],
+                stairs: ['assets/v2/img_m_stairs1.png', 'assets/v2/img_m_stairs2.png'],
+                bike: ['assets/v2/img_m_bike1.png', 'assets/v2/img_m_bike2.png'],
+                eliptica: ['assets/v2/img_m_treadmill1.png', 'assets/v2/img_m_treadmill2.png'],
+                treadmill: ['assets/v2/img_m_treadmill1.png', 'assets/v2/img_m_treadmill2.png'],
+                jacks: ['assets/v2/img_m_jacks1.png', 'assets/v2/img_m_jacks2.png'],
+                weights: ['assets/v2/img_m_weights1.png', 'assets/v2/img_m_weights2.png'],
+                bands: ['assets/v2/img_m_bands1.png', 'assets/v2/img_m_bands2.png'],
+                chair: ['assets/v2/img_m_chair1.png', 'assets/v2/img_m_chair2.png'],
+                mochila: ['assets/v2/img_m_backpack1.png', 'assets/v2/img_m_backpack2.png'],
+                mochilaRow: ['assets/v2/img_m_backpack_row1.png', 'assets/v2/img_m_backpack_row2.png'],
+                pushups: ['assets/v2/img_m_pushups1.png', 'assets/v2/img_m_pushups2.png'],
+                plank: ['assets/v2/img_m_plank1.png', 'assets/v2/img_m_plank2.png'],
+                stretch: ['assets/v2/img_m_warm_legs1.png', 'assets/v2/img_m_warm_legs2.png'],
+                geroWarmup: ['assets/v2/img_m_gero_warm1.png', 'assets/v2/img_m_gero_warm2.png'],
+                geroLegs: ['assets/v2/img_m_gero_legs1.png', 'assets/v2/img_m_gero_legs2.png'],
+                geroSitStand: ['assets/v2/img_m_gero_sitstand1.png', 'assets/v2/img_m_gero_sitstand2.png'],
+                geroBalance: ['assets/v2/img_m_gero_balance1.png', 'assets/v2/img_m_gero_balance2.png'],
+                geroStretch: ['assets/v2/img_m_gero_stretch1.png', 'assets/v2/img_m_gero_stretch2.png']
             }
         };
 
         const gImg = images[gender] || images['mujer']; // Backup fallback
+        
+        // --- CASE: GERONTOLOGICAL THERAPEUTIC PROGRAM ---
+        if (userProfile.mobilityActive) {
+            return generateTherapeuticRoutine(userProfile.mobilityType, gImg);
+        }
+
         const isSenior = parseInt(userProfile.age) >= 60;
         const isBeginner = lvl === 'principiante';
         const useAsistedImgs = isSenior || isBeginner;
 
         const seniorImgs = {
-            squat: ['assets/elder_squat1.png', 'assets/elder_squat2.png'],
-            pushup: ['assets/elder_pushup1.png', 'assets/elder_pushup2.png'],
-            plank: ['assets/elder_plank1.png', 'assets/elder_plank2.png'],
-            rot: ['assets/elder_rot1.png', 'assets/elder_rot2.png']
+            squat: gImg.geroSitStand || gImg.chair,
+            pushup: gImg.pushups,
+            plank: gImg.plank,
+            rot: gImg.warmupTorso
         };
 
         const hasEscoba = equip.includes('escoba');
         const hasGradas = equip.includes('gradas');
         
         // 1. Warmup Dividido en Series Variadas
+        // Serie 1: Cabeza y Cuello (Fundamental)
+        routine.push({
+            type: 'warmup',
+            name: 'Calentamiento (1/3): Rotación de Cabeza',
+            tip: 'Mueve la cabeza lentamente en círculos para relajar las cervicales.',
+            duration: 45,
+            frames: gImg.warmupHead
+        });
+
+        // Serie 2: Torso o Escoba
         if (hasEscoba) {
             routine.push({
                 type: 'warmup',
-                name: 'Calentamiento con Escoba (1/3): Rotación de Torso',
-                tip: 'Toma el palo de escoba tras la nuca y gira suavemente de lado a lado para soltar lumbares.',
+                name: 'Calentamiento (2/3): Rotación con Escoba',
+                tip: 'Toma el palo de escoba tras la nuca y gira suavemente de lado a lado.',
                 duration: 60,
-                frames: gImg.escoba || gImg.warmupArms
+                frames: gImg.escoba
             });
         } else {
-            let warmupName = isSenior ? 'Calentamiento (1/3): Rotación Sentado' : 'Calentamiento (1/3): Círculos de Brazos';
-            let warmupTip = isSenior ? 'Siéntate en una silla firme. Gira tu torso lentamente de un lado a otro para no forzar la espalda baja.' : 'Rotaciones muy amplias. Empieza pequeño y agranda el círculo.';
             routine.push({
                 type: 'warmup',
-                name: warmupName,
-                tip: warmupTip,
-                duration: 60,
-                frames: isSenior ? seniorImgs.rot : gImg.warmupArms
+                name: 'Calentamiento (2/3): Giros de Torso',
+                tip: 'Con las manos en la cadera, gira tu tronco suavemente.',
+                duration: 45,
+                frames: gImg.warmupTorso
             });
         }
 
+        // Serie 3: Extremidades (Piernas o Brazos)
         if (hasGradas) {
             routine.push({
                 type: 'warmup',
-                name: 'Calentamiento (2/3): Escalón Ligeramente',
-                tip: 'Sube y baja el primer escalón lentamente para irrigar los gemelos y rodillas.',
+                name: 'Calentamiento (3/3): Activación en Escalón',
+                tip: 'Sube y baja el primer escalón a ritmo constante.',
                 duration: 60,
-                frames: gImg.warmupLegs
+                frames: gImg.stairs
             });
         } else {
             routine.push({
                 type: 'warmup',
-                name: 'Calentamiento (2/3): Desplantes Cortos (Piernas)',
-                tip: 'Flexiona ligeramente tus rodillas. Pequeños pasos frontales para calentar cuádriceps.',
-                duration: 60,
-                frames: gImg.warmupLegs
+                name: 'Calentamiento (3/3): Círculos de Brazos',
+                tip: 'Realiza círculos amplios con tus brazos para calentar hombros.',
+                duration: 45,
+                frames: gImg.warmupArms
             });
         }
-
-        routine.push({
-            type: 'warmup',
-            name: 'Calentamiento (3/3): Activación Cardiovascular',
-            tip: 'Pequeños saltitos simulando saltar cuerda a ritmo muy suave.',
-            duration: 60,
-            frames: gImg.jacks
-        });
 
         const hasBolsas = equip.includes('bolsas');
         const hasBike = equip.includes('bici');
@@ -615,14 +757,17 @@ document.addEventListener('DOMContentLoaded', () => {
         let strengthOptions = [];
         if (hasMochila) {
             strengthOptions.push({ type: 'work', name: 'Sentadilla Frontal (Mochila)', tip: 'Sujeta la mochila contra tu pecho y baja profundo.', duration: repTime, frames: gImg.mochila });
+            strengthOptions.push({ type: 'work', name: 'Remo a una mano (Mochila)', tip: 'Sujeta la mochila por el asa superior y tira hacia tu cadera.', duration: repTime, frames: gImg.mochilaRow });
             strengthOptions.push({ type: 'work', name: 'Peso Muerto (Mochila)', tip: 'Inclina el tronco cuidando espalda recta.', duration: repTime, frames: gImg.mochila });
         }
-        if (hasWeights || hasBolsas) {
-            let eqName = hasWeights ? "Mancuernas" : "Fundas";
+        if (hasWeights || hasBolsas || equip.includes('bandas')) {
+            let eqName = hasWeights ? "Mancuernas" : (equip.includes('bandas') ? "Bandas Elásticas" : "Fundas");
+            let eqFrames = equip.includes('bandas') ? gImg.bands : gImg.weights;
+            
             let eqTip = isRodilla ? 'Baja poco.' : 'Rodillas hacia afuera.';
             if (isHombro && (hasWeights || hasBolsas)) eqTip += ' No levantes pesas por encima del cuello.';
-            strengthOptions.push({ type: 'work', name: `Sentadillas con ${eqName}`, tip: eqTip, duration: repTime, frames: gImg.weights });
-            strengthOptions.push({ type: 'work', name: `Peso Muerto con ${eqName}`, tip: 'Flexiona ligeramente las rodillas, empuja glúteos atrás.', duration: repTime, frames: gImg.weights });
+            strengthOptions.push({ type: 'work', name: `Sentadillas con ${eqName}`, tip: eqTip, duration: repTime, frames: eqFrames });
+            strengthOptions.push({ type: 'work', name: `Peso Muerto con ${eqName}`, tip: 'Flexiona ligeramente las rodillas, empuja glúteos atrás.', duration: repTime, frames: eqFrames });
         } 
         if (hasChair || useAsistedImgs) {
             let squatName = isBeginner ? 'Sentadilla Asistida (Silla)' : 'Sentadilla Tocando Silla';
@@ -815,7 +960,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=150&q=80"
                 ];
                 imgUrl = arr[idx % arr.length];
-            } else if (lname.includes('muerto') || lname.includes('mochila') || lname.includes('peso')) {
+            } else if (lname.includes('mochila')) {
+                imgUrl = userProfile.gender === 'mujer' ? 'assets/img_f_backpack1.png' : 'assets/img_m_backpack1.png';
+            } else if (lname.includes('muerto') || lname.includes('peso')) {
                 const arr = [
                     "https://images.unsplash.com/photo-1603287681836-b174ce5074c2?auto=format&fit=crop&w=150&q=80",
                     "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=150&q=80"
@@ -839,6 +986,48 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             exercisesList.appendChild(item);
         });
+    }
+
+    function generateTherapeuticRoutine(type, gImg) {
+        let routine = [];
+        const repTime = 45; // Tiempo de repetición terapéutica
+
+        // Fase 1: Calentamiento Articular Suave
+        routine.push({ type: 'warmup', name: 'Calentamiento Articular (1/2)', tip: 'Sentado correctamente, mueve tus hombros en círculos suaves hacia atrás para liberar tensión.', duration: 60, frames: gImg.geroWarmup || gImg.warmupArms });
+        routine.push({ type: 'warmup', name: 'Movilidad de Cuello (2/2)', tip: 'Inclina la cabeza lentamente hacia un lado y luego al otro. No fuerces el movimiento.', duration: 50, frames: gImg.geroWarmup || gImg.warmupArms });
+
+        // Fase 2: Trabajo Terapéutico Específico
+        if (type === 'balance') {
+            routine.push({ type: 'work', name: 'Apoyo Unipodal Asistido', tip: 'Sujétate de una silla firme. Levanta un pie ligeramente y mantén el equilibrio 10 segundos por lado.', duration: repTime, frames: gImg.geroBalance });
+            routine.push({ type: 'work', name: 'Movilidad de Tobillo alterno', tip: 'Sentado o de pie con apoyo, realiza círculos con la punta del pie en el aire.', duration: repTime, frames: gImg.geroWarmup });
+            routine.push({ type: 'work', name: 'Marcha Estática con Apoyo', tip: 'Simula caminar sin moverte del sitio, manteniendo siempre una mano en la silla.', duration: repTime, frames: gImg.geroBalance });
+        } 
+        else if (type === 'artrosis') {
+            routine.push({ type: 'work', name: 'Giro de Muñecas y Dedos', tip: 'Abre y cierra las manos rítmicamente. Realiza círculos suaves con las muñecas.', duration: repTime, frames: gImg.geroLegs });
+            routine.push({ type: 'work', name: 'Flexión de Rodilla Sentado', tip: 'Sentado, estira una pierna hacia adelante y luego la otra sin forzar.', duration: repTime, frames: gImg.geroLegs });
+            routine.push({ type: 'work', name: 'Apertura de Pecho Suave', tip: 'Abre tus brazos hacia los lados para expandir la caja torácica y mejorar la capacidad pulmonar.', duration: repTime, frames: gImg.geroStretch });
+        }
+        else if (type === 'sarcopenia') {
+            routine.push({ type: 'work', name: 'Sentarse y Levantarse (Silla)', tip: 'Usa una silla firme sin apoyabrazos si es posible. Levántate usando la fuerza de tus piernas.', duration: repTime, frames: gImg.geroSitStand });
+            routine.push({ type: 'work', name: 'Extensión de Cuádriceps', tip: 'Sentado, levanta el pie hasta que la pierna esté recta y mantén 1 segundo.', duration: repTime, frames: gImg.geroLegs });
+            routine.push({ type: 'work', name: 'Empuje contra la Pared', tip: 'A falta de pesas, apóyate en la pared y realiza un pequeño empuje para fortalecer brazos.', duration: repTime, frames: gImg.pushups });
+        }
+        else if (type === 'silla') {
+            routine.push({ type: 'work', name: 'Marcha Sentado', tip: 'Mueve tus rodillas hacia arriba rítmicamente como si caminaras mientras estás sentado.', duration: repTime, frames: gImg.geroLegs });
+            routine.push({ type: 'work', name: 'Inclinación de Tronco', tip: 'Sentado, inclínate un poco hacia adelante y vuelve a la posición recta para trabajar el core.', duration: repTime, frames: gImg.geroStretch });
+            routine.push({ type: 'work', name: 'Remo con Brazos Libres', tip: 'Lleva tus codos hacia atrás con fuerza, apretando las escápulas.', duration: repTime, frames: gImg.geroWarmup });
+        }
+        else if (type === 'postop') {
+            routine.push({ type: 'work', name: 'Isometría de Piernas', tip: 'Aprieta el muslo contra el asiento de la silla y mantén la tensión 5 segundos.', duration: repTime, frames: gImg.geroLegs });
+            routine.push({ type: 'work', name: 'Desplazamiento Lateral de Pie', tip: 'Con apoyo en silla, mueve una pierna hacia el lado y regresa suavemente.', duration: repTime, frames: gImg.geroLegs });
+            routine.push({ type: 'work', name: 'Estiramiento de Cadera Sentado', tip: 'Cruza una pierna sobre la otra (si está permitido) y presiona suavemente hacia abajo.', duration: repTime, frames: gImg.geroStretch });
+        }
+
+        // Fase 3: Recuperación Final
+        routine.push({ type: 'stretch', name: 'Respiración Diafragmática', tip: 'Inhala profundamente por la nariz inflando el abdomen y suelta por la boca.', duration: 50, frames: gImg.geroStretch });
+        routine.push({ type: 'stretch', name: 'Relajación de Brazos', tip: 'Cruza un brazo sobre el pecho y presiona suavemente con el otro.', duration: 40, frames: gImg.geroStretch });
+
+        return routine;
     }
 
     // Inicialización automática desde Memoria
