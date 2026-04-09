@@ -555,13 +555,13 @@ header p {
     object-fit: contain;
     background: transparent;
     opacity: 0;
-    transition: opacity 0.85s ease-in-out, transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
-    transform: scale(0.96) translateY(8px);
+    transition: opacity 0.4s ease-in-out, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(0.98);
 }
 
 .anim-frame.active {
     opacity: 1;
-    transform: scale(1.03) translateY(-2px);
+    transform: scale(1);
 }
 
 .visual-loading {
@@ -603,12 +603,23 @@ header p {
     text-align: center;
 }
 .timer-display {
-    font-size: 4.5rem;
-    font-weight: 800;
+    font-size: 5rem;
+    font-weight: 900;
     color: var(--text-main);
     font-variant-numeric: tabular-nums;
     margin-bottom: 1.5rem;
-    text-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+    text-shadow: 0 0 30px rgba(0, 229, 255, 0.4), 0 0 10px rgba(0, 229, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.timer-display.running {
+    color: var(--turquoise);
+    animation: timerPulse 1s infinite alternate;
+}
+
+@keyframes timerPulse {
+    from { text-shadow: 0 0 20px rgba(0, 229, 255, 0.3); }
+    to { text-shadow: 0 0 40px rgba(0, 229, 255, 0.6); }
 }
 
 .timer-controls {

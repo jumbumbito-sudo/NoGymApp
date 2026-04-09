@@ -351,8 +351,8 @@ document.addEventListener('DOMContentLoaded', () => {
         exDesc.textContent = ex.tip;
         
         // Setup Images (Start and End frames)
-        frame1.src = ex.frames[0];
-        frame2.src = ex.frames[1];
+        frame1.src = 'assets/' + ex.frames[0];
+        frame2.src = 'assets/' + ex.frames[1];
         
         // Reset classes
         frame1.classList.add('active');
@@ -428,6 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentRemainingTime <= 0) return;
         
         isTimerRunning = true;
+        exTimerDisplay.classList.add('running'); // Efecto visual
         timerToggleBtn.textContent = 'Pausar';
         timerToggleBtn.style.background = 'transparent';
         timerToggleBtn.style.border = '1px solid var(--error)';
@@ -437,19 +438,25 @@ document.addEventListener('DOMContentLoaded', () => {
             currentRemainingTime--;
             updateTimerDisplay();
 
+            if (currentRemainingTime === 15) {
+                const motivaciones = ["¡Tú puedes!", "Manten la postura.", "¡Ya casi lo tienes!", "Sigue así."];
+                speak(motivaciones[Math.floor(Math.random() * motivaciones.length)]);
+            }
+
             if (currentRemainingTime === 10) speak("Diez segundos.");
             if (currentRemainingTime === 3) speak("3, 2, 1.");
 
             if (currentRemainingTime <= 0) {
                 pauseTimer();
                 speak("¡Tiempo! Descansa.");
-                setTimeout(nextExercise, 1000);
+                setTimeout(nextExercise, 1200);
             }
         }, 1000);
     }
 
     function pauseTimer() {
         isTimerRunning = false;
+        exTimerDisplay.classList.remove('running');
         clearInterval(timerInterval);
         if (currentRemainingTime > 0) {
             timerToggleBtn.textContent = 'Reanudar';
@@ -651,7 +658,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 mochilaRow: ['img_m_backpack_row1.png', 'img_m_backpack_row2.png'],
                 pushups: ['img_m_pushups1.png', 'img_m_pushups2.png'],
                 plank: ['img_m_plank1.png', 'img_m_plank2.png'],
-                stretch: ['img_m_warm_legs1.png', 'img_m_warm_legs2.png'],
+                stretch: ['img_m_stretch1.png', 'img_m_stretch2.png'],
                 geroWarmup: ['img_m_gero_warm1.png', 'img_m_gero_warm2.png'],
                 geroLegs: ['img_m_gero_legs1.png', 'img_m_gero_legs2.png'],
                 geroSitStand: ['img_m_gero_sitstand1.png', 'img_m_gero_sitstand2.png'],
