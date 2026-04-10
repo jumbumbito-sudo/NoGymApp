@@ -375,12 +375,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function speak(text) {
-        if (stats.isAudioMuted || !window.speechSynthesis) return;
-        window.speechSynthesis.cancel(); // Parar lo anterior
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'es-ES';
-        utterance.rate = 1.1;
-        window.speechSynthesis.speak(utterance);
+        // Funcionalidad de voz desactivada por petición del usuario
+        // if (stats.isAudioMuted || !window.speechSynthesis) return;
+        // window.speechSynthesis.cancel();
+        // const utterance = new SpeechSynthesisUtterance(text);
+        // utterance.lang = 'es-ES';
+        // utterance.rate = 1.1;
+        // window.speechSynthesis.speak(utterance);
     }
 
     audioToggleBtn.addEventListener('click', () => {
