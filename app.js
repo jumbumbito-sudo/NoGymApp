@@ -655,17 +655,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 weights: ['img_m_weights1.png', 'img_m_weights2.png'],
                 bands: ['img_m_bands1.png', 'img_m_bands2.png'],
                 chair: ['img_m_chair1.png', 'img_m_chair2.png'],
-                mochila: ['img_m_backpack1.png', 'img_m_backpack2.png'],
-                mochilaRow: ['img_m_backpack_row1.png', 'img_m_backpack_row2.png'],
-                pushups: ['img_m_pushups1.png', 'img_m_pushups2.png'],
-                plank: ['img_m_plank1.png', 'img_m_plank2.png'],
-                stretch: ['img_m_stretch1.png', 'img_m_stretch2.png'],
-                geroWarmup: ['img_m_gero_warm1.png', 'img_m_gero_warm2.png'],
-                geroLegs: ['img_m_gero_legs1.png', 'img_m_gero_legs2.png'],
-                geroSitStand: ['img_m_gero_sitstand1.png', 'img_m_gero_sitstand2.png'],
-                geroBalance: ['img_m_gero_balance1.png', 'img_m_gero_balance2.png'],
-                geroStretch: ['img_m_gero_stretch1.png', 'img_m_gero_stretch2.png']
-            }
+            mochila: ['img_m_backpack1.png', 'img_m_backpack2.png'],
+            mochilaFrontSquat: ['img_m_gero_sitstand1.png', 'img_m_backpack2.png'], // Biomecánica (Silla) -> Carga (Mochila)
+            mochilaRow: ['img_m_backpack_row1.png', 'img_m_backpack_row2.png'],
+            mochilaRowSingle: ['img_m_backpack_row_single.png', 'img_m_backpack_row_single.png'],
+            pushups: ['img_m_pushups1.png', 'img_m_pushups2.png'],
+            plank: ['img_m_plank1.png', 'img_m_plank_knee.png'], // Usa la nueva plancha de rodillas
+            stretch: ['img_m_stretch1.png', 'img_m_stretch_arms.png'],
+            breathing: ['img_m_breathing1.png', 'img_m_breathing1.png'],
+            geroWarmup: ['img_m_gero_shrugs.png', 'img_m_gero_shrugs.png'],
+            geroLegs: ['img_m_gero_legs1.png', 'img_m_gero_legs2.png'],
+            geroSitStand: ['img_m_gero_sitstand1.png', 'img_m_gero_sitstand2.png'],
+            geroBalance: ['img_m_gero_balance1.png', 'img_m_gero_balance2.png'],
+            geroStretch: ['img_m_gero_stretch1.png', 'img_m_gero_stretch1.png']
+        }
         };
 
         const gImg = images[gender] || images['mujer']; // Backup fallback
@@ -764,9 +767,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3. Main Work (bloque de Fuerza con variación)
         let strengthOptions = [];
         if (hasMochila) {
-            strengthOptions.push({ type: 'work', name: 'Sentadilla Frontal (Mochila)', tip: 'Sujeta la mochila contra tu pecho y baja profundo.', duration: repTime, frames: gImg.mochila });
-            strengthOptions.push({ type: 'work', name: 'Remo a una mano (Mochila)', tip: 'Sujeta la mochila por el asa superior y tira hacia tu cadera.', duration: repTime, frames: gImg.mochilaRow });
-            strengthOptions.push({ type: 'work', name: 'Peso Muerto (Mochila)', tip: 'Inclina el tronco cuidando espalda recta.', duration: repTime, frames: gImg.mochila });
+            strengthOptions.push({ type: 'work', name: 'Sentadilla Frontal', tip: 'Sujeta la mochila contra tu pecho y baja profundo.', duration: repTime, frames: gImg.mochila, framesBio: gImg.mochilaFrontSquat });
+            strengthOptions.push({ type: 'work', name: 'Remo a una mano', tip: 'Sujeta la mochila por el asa superior y tira hacia tu cadera.', duration: repTime, frames: gImg.mochilaRow, framesBio: gImg.mochilaRowSingle });
         }
         if (hasWeights || hasBolsas || equip.includes('bandas')) {
             let eqName = hasWeights ? "Mancuernas" : (equip.includes('bandas') ? "Bandas Elásticas" : "Fundas");
@@ -861,6 +863,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (r === 1) {
                         customName = `${customName} (Serie 1: Biomecánica sin peso)`;
                         customTip = `Fase de Adaptación: Trabaja SOLO CON TU PESO CORPORAL. Enfócate 100% en la técnica muscular correcta. ` + customTip;
+                        if (deepEx.framesBio) deepEx.frames = deepEx.framesBio; // CAMBIO DINÁMICO DE IMAGEN
                     } else if (r === 2) {
                         if (hasWeights || hasMochila || hasBolsas) {
                             customName = `${customName} (Serie 2: Carga Unilateral/Ligera)`;
