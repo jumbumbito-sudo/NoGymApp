@@ -635,35 +635,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 pushups: ['img_f_pushups1.png', 'img_f_pushups2.png'],
                 plank: ['img_f_plank1.png', 'img_f_plank2.png'],
                 stretch: ['img_f_stretch1.png', 'img_f_stretch2.png'],
-                geroWarmup: ['img_f_gero_warm1.png', 'img_f_gero_warm2.png'],
+                geroWarmup: ['img_f_gero_shrugs.png', 'img_f_gero_shrugs.png'],
                 geroLegs: ['img_f_gero_legs1.png', 'img_f_gero_legs2.png'],
-                geroSitStand: ['img_f_gero_sitstand1.png', 'img_f_gero_sitstand2.png'],
+                geroSitStand: ['img_f_gero_sitstand1.png', 'img_m_gero_sitstand2.png'], // Usa el frame 2 de hombre que es compatible
                 geroBalance: ['img_f_gero_balance1.png', 'img_f_gero_balance2.png'],
-                geroStretch: ['img_f_gero_stretch1.png', 'img_f_gero_stretch2.png']
+                geroStretch: ['img_f_gero_legs2.png', 'img_f_gero_balance1.png'],
+                geroNeck: ['img_f_gero_shrugs.png', 'img_m_gero_neck.png'], // Backup hombre hasta completar
+                geroAnkle: ['img_f_gero_legs1.png', 'img_m_gero_ankle.png'],
+                geroWrists: ['img_f_gero_shrugs.png', 'img_m_gero_wrists.png']
             },
             hombre: {
-                warmupHead: ['img_m_warm_head1.png', 'img_m_warm_head2.png'],
-                warmupArms: ['img_m_warm_arms1.png', 'img_m_warm_arms2.png'],
+                warmupHead: ['img_m_warm_head1.png', 'img_m_warm_head1.png'],
+                warmupArms: ['img_m_warm_arms1.png', 'img_m_warm_arms1.png'],
                 warmupTorso: ['img_m_warm_torso1.png', 'img_m_warm_torso2.png'],
-                warmupLegs: ['img_m_warm_legs1.png', 'img_m_warm_legs2.png'],
-                escoba: ['img_m_escoba1.png', 'img_m_escoba2.png'],
-                stairs: ['img_m_stairs1.png', 'img_m_stairs2.png'],
-                bike: ['img_m_bike1.png', 'img_m_bike2.png'],
-                eliptica: ['img_m_treadmill1.png', 'img_m_treadmill2.png'],
-                treadmill: ['img_m_treadmill1.png', 'img_m_treadmill2.png'],
+                warmupLegs: ['img_m_warm_legs1.png', 'img_m_warm_legs1.png'],
+                escoba: ['img_m_escoba1.png', 'img_m_escoba1.png'],
+                stairs: ['img_m_stairs1.png', 'img_m_stairs1.png'],
+                bike: ['img_m_bike1.png', 'img_m_bike1.png'],
+                eliptica: ['img_m_treadmill1.png', 'img_m_treadmill1.png'],
+                treadmill: ['img_m_treadmill1.png', 'img_m_treadmill1.png'],
                 jacks: ['img_m_jacks1.png', 'img_m_jacks2.png'],
                 weights: ['img_m_weights1.png', 'img_m_weights2.png'],
                 bands: ['img_m_bands1.png', 'img_m_bands2.png'],
-                chair: ['img_m_chair1.png', 'img_m_chair2.png'],
+                chair: ['img_m_chair1.png', 'img_m_chair1.png'],
             mochila: ['img_m_backpack1.png', 'img_m_backpack2.png'],
-            mochilaFrontSquat: ['img_m_gero_sitstand1.png', 'img_m_backpack2.png'], // Biomecánica (Silla) -> Carga (Mochila)
+            mochilaFrontSquat: ['img_m_gero_sitstand1.png', 'img_m_backpack2.png'], 
             mochilaRow: ['img_m_backpack_row1.png', 'img_m_backpack_row2.png'],
             mochilaRowSingle: ['img_m_backpack_row_single.png', 'img_m_backpack_row_single.png'],
             pushups: ['img_m_pushups1.png', 'img_m_pushups2.png'],
-            plank: ['img_m_plank1.png', 'img_m_plank_knee.png'], // Usa la nueva plancha de rodillas
+            plank: ['img_m_plank1.png', 'img_m_plank_knee.png'], 
             stretch: ['img_m_stretch1.png', 'img_m_stretch_arms.png'],
             breathing: ['img_m_breathing1.png', 'img_m_breathing1.png'],
             geroWarmup: ['img_m_gero_shrugs.png', 'img_m_gero_shrugs.png'],
+            geroNeck: ['img_m_gero_neck.png', 'img_m_gero_neck.png'],
+            geroAnkle: ['img_m_gero_ankle.png', 'img_m_gero_ankle.png'],
+            geroWrists: ['img_m_gero_wrists.png', 'img_m_gero_wrists.png'],
+            geroRow: ['img_m_gero_row_free.png', 'img_m_gero_row_free.png'],
+            geroChest: ['img_m_gero_chest.png', 'img_m_gero_chest.png'],
+            geroSideLeg: ['img_m_gero_side_leg.png', 'img_m_gero_side_leg.png'],
             geroLegs: ['img_m_gero_legs1.png', 'img_m_gero_legs2.png'],
             geroSitStand: ['img_m_gero_sitstand1.png', 'img_m_gero_sitstand2.png'],
             geroBalance: ['img_m_gero_balance1.png', 'img_m_gero_balance2.png'],
@@ -1004,39 +1013,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const repTime = 45; // Tiempo de repetición terapéutica
 
         // Fase 1: Calentamiento Articular Suave
-        routine.push({ type: 'warmup', name: 'Calentamiento Articular (1/2)', tip: 'Sentado correctamente, mueve tus hombros en círculos suaves hacia atrás para liberar tensión.', duration: 60, frames: gImg.geroWarmup || gImg.warmupArms });
-        routine.push({ type: 'warmup', name: 'Movilidad de Cuello (2/2)', tip: 'Inclina la cabeza lentamente hacia un lado y luego al otro. No fuerces el movimiento.', duration: 50, frames: gImg.geroWarmup || gImg.warmupArms });
+        routine.push({ type: 'warmup', name: 'Calentamiento de Hombros', tip: 'Sentado correctamente, mueve tus hombros en círculos suaves hacia atrás para liberar tensión.', duration: 50, frames: gImg.geroWarmup });
+        routine.push({ type: 'warmup', name: 'Movilidad de Cuello', tip: 'Inclina la cabeza lentamente hacia un lado y luego al otro. No fuerces el movimiento.', duration: 50, frames: gImg.geroNeck || gImg.geroWarmup });
 
         // Fase 2: Trabajo Terapéutico Específico
         if (type === 'balance') {
-            routine.push({ type: 'work', name: 'Apoyo Unipodal Asistido', tip: 'Sujétate de una silla firme. Levanta un pie ligeramente y mantén el equilibrio 10 segundos por lado.', duration: repTime, frames: gImg.geroBalance });
-            routine.push({ type: 'work', name: 'Movilidad de Tobillo alterno', tip: 'Sentado o de pie con apoyo, realiza círculos con la punta del pie en el aire.', duration: repTime, frames: gImg.geroWarmup });
+            routine.push({ type: 'work', name: 'Apoyo Unipodal Asistido', tip: 'Sujétate de una silla firme. Levanta un pie ligeramente y mantén el equilibrio.', duration: repTime, frames: gImg.geroBalance });
+            routine.push({ type: 'work', name: 'Movilidad de Tobillo', tip: 'Sentado o de pie con apoyo, realiza círculos con la punta del pie en el aire.', duration: repTime, frames: gImg.geroAnkle || gImg.geroLegs });
             routine.push({ type: 'work', name: 'Marcha Estática con Apoyo', tip: 'Simula caminar sin moverte del sitio, manteniendo siempre una mano en la silla.', duration: repTime, frames: gImg.geroBalance });
         } 
         else if (type === 'artrosis') {
-            routine.push({ type: 'work', name: 'Giro de Muñecas y Dedos', tip: 'Abre y cierra las manos rítmicamente. Realiza círculos suaves con las muñecas.', duration: repTime, frames: gImg.geroLegs });
+            routine.push({ type: 'work', name: 'Giro de Muñecas y Dedos', tip: 'Abre y cierra las manos rítmicamente. Realiza círculos suaves con las muñecas.', duration: repTime, frames: gImg.geroWrists || gImg.geroWarmup });
             routine.push({ type: 'work', name: 'Flexión de Rodilla Sentado', tip: 'Sentado, estira una pierna hacia adelante y luego la otra sin forzar.', duration: repTime, frames: gImg.geroLegs });
-            routine.push({ type: 'work', name: 'Apertura de Pecho Suave', tip: 'Abre tus brazos hacia los lados para expandir la caja torácica y mejorar la capacidad pulmonar.', duration: repTime, frames: gImg.geroStretch });
+            routine.push({ type: 'work', name: 'Apertura de Pecho Suave', tip: 'Abre tus brazos hacia los lados para expandir la caja torácica.', duration: repTime, frames: gImg.geroChest || gImg.geroStretch });
         }
         else if (type === 'sarcopenia') {
-            routine.push({ type: 'work', name: 'Sentarse y Levantarse (Silla)', tip: 'Usa una silla firme sin apoyabrazos si es posible. Levántate usando la fuerza de tus piernas.', duration: repTime, frames: gImg.geroSitStand });
+            routine.push({ type: 'work', name: 'Sentarse y Levantarse (Silla)', tip: 'Usa una silla firme sin apoyabrazos. Levántate usando la fuerza de tus piernas.', duration: repTime, frames: gImg.geroSitStand });
             routine.push({ type: 'work', name: 'Extensión de Cuádriceps', tip: 'Sentado, levanta el pie hasta que la pierna esté recta y mantén 1 segundo.', duration: repTime, frames: gImg.geroLegs });
-            routine.push({ type: 'work', name: 'Empuje contra la Pared', tip: 'A falta de pesas, apóyate en la pared y realiza un pequeño empuje para fortalecer brazos.', duration: repTime, frames: gImg.pushups });
+            routine.push({ type: 'work', name: 'Empuje contra la Pared', tip: 'Apóyate en la pared y realiza un pequeño empuje para fortalecer brazos.', duration: repTime, frames: gImg.pushups });
         }
         else if (type === 'silla') {
             routine.push({ type: 'work', name: 'Marcha Sentado', tip: 'Mueve tus rodillas hacia arriba rítmicamente como si caminaras mientras estás sentado.', duration: repTime, frames: gImg.geroLegs });
-            routine.push({ type: 'work', name: 'Inclinación de Tronco', tip: 'Sentado, inclínate un poco hacia adelante y vuelve a la posición recta para trabajar el core.', duration: repTime, frames: gImg.geroStretch });
-            routine.push({ type: 'work', name: 'Remo con Brazos Libres', tip: 'Lleva tus codos hacia atrás con fuerza, apretando las escápulas.', duration: repTime, frames: gImg.geroWarmup });
+            routine.push({ type: 'work', name: 'Inclinación de Tronco', tip: 'Sentado, inclínate un poco hacia adelante y vuelve a la posición recta.', duration: repTime, frames: gImg.geroStretch });
+            routine.push({ type: 'work', name: 'Remo con Brazos Libres', tip: 'Lleva tus codos hacia atrás con fuerza, apretando las escápulas.', duration: repTime, frames: gImg.geroRow || gImg.geroWarmup });
         }
         else if (type === 'postop') {
-            routine.push({ type: 'work', name: 'Isometría de Piernas', tip: 'Aprieta el muslo contra el asiento de la silla y mantén la tensión 5 segundos.', duration: repTime, frames: gImg.geroLegs });
-            routine.push({ type: 'work', name: 'Desplazamiento Lateral de Pie', tip: 'Con apoyo en silla, mueve una pierna hacia el lado y regresa suavemente.', duration: repTime, frames: gImg.geroLegs });
-            routine.push({ type: 'work', name: 'Estiramiento de Cadera Sentado', tip: 'Cruza una pierna sobre la otra (si está permitido) y presiona suavemente hacia abajo.', duration: repTime, frames: gImg.geroStretch });
+            routine.push({ type: 'work', name: 'Isometría de Piernas', tip: 'Aprieta el muslo contra el asiento de la silla y mantén la tensión.', duration: repTime, frames: gImg.geroLegs });
+            routine.push({ type: 'work', name: 'Desplazamiento Lateral de Pie', tip: 'Con apoyo en silla, mueve una pierna hacia el lado y regresa suavemente.', duration: repTime, frames: gImg.geroSideLeg || gImg.geroLegs });
+            routine.push({ type: 'work', name: 'Estiramiento de Cadera Sentado', tip: 'Cruza una pierna sobre la otra y presiona suavemente hacia abajo.', duration: repTime, frames: gImg.geroStretch });
         }
 
         // Fase 3: Recuperación Final
-        routine.push({ type: 'stretch', name: 'Respiración Diafragmática', tip: 'Inhala profundamente por la nariz inflando el abdomen y suelta por la boca.', duration: 50, frames: gImg.geroStretch });
-        routine.push({ type: 'stretch', name: 'Relajación de Brazos', tip: 'Cruza un brazo sobre el pecho y presiona suavemente con el otro.', duration: 40, frames: gImg.geroStretch });
+        routine.push({ type: 'stretch', name: 'Respiración Diafragmática', tip: 'Inhala profundamente por la nariz inflando el abdomen y suelta por la boca.', duration: 50, frames: gImg.breathing || gImg.geroStretch });
+        routine.push({ type: 'stretch', name: 'Relajación de Brazos', tip: 'Cruza un brazo sobre el pecho y presiona suavemente con el otro.', duration: 40, frames: gImg.stretch });
 
         return routine;
     }
