@@ -346,9 +346,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadExerciseIntoPlayer() {
         const ex = currentRoutine[activeExerciseIndex];
         
-        playerProgress.textContent = `Ejercicio ${activeExerciseIndex + 1} de ${currentRoutine.length}`;
-        exName.textContent = ex.name;
-        exDesc.textContent = ex.tip;
+        document.getElementById('exercise-name').innerText = ex.name;
+        typeText(document.getElementById('exercise-desc'), ex.tip, 15);
+        document.getElementById('player-progress').innerText = `Ejercicio ${activeExerciseIndex + 1} de ${currentRoutine.length}`;
         
         // Setup Images (Start and End frames)
         frame1.src = 'assets/' + ex.frames[0];
@@ -530,11 +530,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('stat-workouts').textContent = stats.totalWorkouts;
         document.getElementById('stat-minutes').textContent = `${stats.totalMinutes} min`;
         document.getElementById('stat-streak').textContent = stats.streak;
+        const nutritionText = generateNutritionPlan();
+        typeText(document.getElementById('nutrition-text'), nutritionText, 20);
     }
 
     function generateNutritionPlan() {
-        const textEl = document.getElementById('nutrition-text');
-        
         let baseStrategy = "";
         if (userProfile.bodyType === "delgado") {
             baseStrategy = "<strong>Objetivo: Ganar Masa Muscular (Superávit Calórico).</strong><br>Necesitas comer raciones un poco más grandes. Aumenta tus <em>carbohidratos complejos</em> (avena, papa, arroz integral) y consume mucha <em>proteína</em> (huevos, pollo, carnes) para nutrir esos músculos nuevos.";
@@ -574,7 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         wPlan += "</p></div>";
 
-        textEl.innerHTML = baseStrategy + healthTips + wPlan;
+        return baseStrategy + healthTips + wPlan;
     }
 
     completeDayBtn.addEventListener('click', () => {
@@ -591,15 +591,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- HELPERS ---
+    const typeText = (element, text, speed = 25) => {
+        element.innerHTML = '';
+        let i = 0;
+        const interval = setInterval(() => {
+            if (i < text.length) {
+                element.innerHTML += text.charAt(i);
+                i++;
+            } else {
+                clearInterval(interval);
+            }
+        }, speed);
+    };
+
+    const showSection = (sectionId) => {
+        // Cyber-smooth transition
+        const sections = ['form-section', 'loading-section', 'dashboard-section', 'player-section', 'completion-section', 'profile-section', 'community-section', 'statistics-section'];
+        sections.forEach(id => {
+            const sect = document.getElementById(id);
+            if (id === sectionId) {
+                sect.style.display = 'block';
+                setTimeout(() => sect.classList.add('active'), 50);
+            } else {
+                sect.classList.remove('active');
+                setTimeout(() => {
+                    if (!sect.classList.contains('active')) sect.style.display = 'none';
+                }, 600);
+            }
+        });
+
+        // Update nav visibility
+        if (sectionId === 'form-section' || sectionId === 'loading-section') {
+            document.querySelectorAll('.header-actions, #header-stats-btn, #header-community-btn').forEach(el => el.classList.add('hidden'));
+        } else {
+            document.querySelectorAll('.header-actions, #header-stats-btn, #header-community-btn').forEach(el => el.classList.remove('hidden'));
+        }
+    };
+
     function switchView(hideEl, showEl) {
-        hideEl.classList.remove('active');
-        setTimeout(() => {
-            hideEl.classList.add('hidden');
-            showEl.classList.remove('hidden');
-            setTimeout(() => {
-                showEl.classList.add('active');
-            }, 50);
-        }, 400);
+        showSection(showEl.id);
     }
 
     // --- MOCK IA LOGIC ---
@@ -631,53 +661,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 bands: ['img_f_bands1.png', 'img_f_bands2.png'],
                 chair: ['img_f_chair1.png', 'img_f_chair2.png'],
                 mochila: ['img_f_backpack1.png', 'img_f_backpack2.png'],
+                mochilaFrontSquat: ['img_f_backpack1.png', 'img_f_backpack2.png'],
                 mochilaRow: ['img_f_backpack_row1.png', 'img_f_backpack_row2.png'],
+                mochilaRowSingle: ['img_f_backpack_row1.png', 'img_f_backpack_row2.png'],
                 pushups: ['img_f_pushups1.png', 'img_f_pushups2.png'],
                 plank: ['img_f_plank1.png', 'img_f_plank2.png'],
+                plankLateral: ['img_f_plank_lateral1.png', 'img_f_plank_lateral2.png'],
                 stretch: ['img_f_stretch1.png', 'img_f_stretch2.png'],
-                geroWarmup: ['img_f_gero_shrugs.png', 'img_f_gero_shrugs.png'],
+                breathing: ['img_f_stretch1.png', 'img_f_stretch2.png'],
+                geroWarmup: ['img_f_gero_warm1.png', 'img_f_gero_warm2.png'],
+                geroNeck: ['img_f_warm_head1.png', 'img_f_warm_head2.png'],
+                geroAnkle: ['img_f_warm_legs1.png', 'img_f_warm_legs2.png'],
+                geroWrists: ['img_f_warm_arms1.png', 'img_f_warm_arms2.png'],
                 geroLegs: ['img_f_gero_legs1.png', 'img_f_gero_legs2.png'],
-                geroSitStand: ['img_f_gero_sitstand1.png', 'img_m_gero_sitstand2.png'], // Usa el frame 2 de hombre que es compatible
+                geroSitStand: ['img_f_gero_sitstand1.png', 'img_f_gero_sitstand2.png'],
                 geroBalance: ['img_f_gero_balance1.png', 'img_f_gero_balance2.png'],
-                geroStretch: ['img_f_gero_legs2.png', 'img_f_gero_balance1.png'],
-                geroNeck: ['img_f_gero_shrugs.png', 'img_m_gero_neck.png'], // Backup hombre hasta completar
-                geroAnkle: ['img_f_gero_legs1.png', 'img_m_gero_ankle.png'],
-                geroWrists: ['img_f_gero_shrugs.png', 'img_m_gero_wrists.png']
+                geroStretch: ['img_f_gero_stretch1.png', 'img_f_gero_stretch2.png'],
+                geroRow: ['img_f_warm_arms1.png', 'img_f_warm_arms2.png'],
+                geroChest: ['img_f_warm_arms1.png', 'img_f_warm_arms2.png'],
+                geroSideLeg: ['img_f_gero_legs1.png', 'img_f_gero_legs2.png']
             },
             hombre: {
-                warmupHead: ['img_m_warm_head1.png', 'img_m_warm_head1.png'],
-                warmupArms: ['img_m_warm_arms1.png', 'img_m_warm_arms1.png'],
+                warmupHead: ['img_m_warm_head1.png', 'img_m_warm_head2.png'],
+                warmupArms: ['img_m_warm_arms1.png', 'img_m_warm_arms2.png'],
                 warmupTorso: ['img_m_warm_torso1.png', 'img_m_warm_torso2.png'],
-                warmupLegs: ['img_m_warm_legs1.png', 'img_m_warm_legs1.png'],
-                escoba: ['img_m_escoba1.png', 'img_m_escoba1.png'],
-                stairs: ['img_m_stairs1.png', 'img_m_stairs1.png'],
-                bike: ['img_m_bike1.png', 'img_m_bike1.png'],
-                eliptica: ['img_m_treadmill1.png', 'img_m_treadmill1.png'],
-                treadmill: ['img_m_treadmill1.png', 'img_m_treadmill1.png'],
+                warmupLegs: ['img_m_warm_legs1.png', 'img_m_warm_legs2.png'],
+                escoba: ['img_m_escoba1.png', 'img_m_escoba2.png'],
+                stairs: ['img_m_stairs1.png', 'img_m_stairs2.png'],
+                bike: ['img_m_bike1.png', 'img_m_bike2.png'],
+                eliptica: ['img_m_treadmill1.png', 'img_m_treadmill2.png'],
+                treadmill: ['img_m_treadmill1.png', 'img_m_treadmill2.png'],
                 jacks: ['img_m_jacks1.png', 'img_m_jacks2.png'],
                 weights: ['img_m_weights1.png', 'img_m_weights2.png'],
                 bands: ['img_m_bands1.png', 'img_m_bands2.png'],
-                chair: ['img_m_chair1.png', 'img_m_chair1.png'],
-            mochila: ['img_m_backpack1.png', 'img_m_backpack2.png'],
-            mochilaFrontSquat: ['img_m_gero_sitstand1.png', 'img_m_backpack2.png'], 
-            mochilaRow: ['img_m_backpack_row1.png', 'img_m_backpack_row2.png'],
-            mochilaRowSingle: ['img_m_backpack_row_single.png', 'img_m_backpack_row_single.png'],
-            pushups: ['img_m_pushups1.png', 'img_m_pushups2.png'],
-            plank: ['img_m_plank1.png', 'img_m_plank_knee.png'], 
-            stretch: ['img_m_stretch1.png', 'img_m_stretch_arms.png'],
-            breathing: ['img_m_breathing1.png', 'img_m_breathing1.png'],
-            geroWarmup: ['img_m_gero_shrugs.png', 'img_m_gero_shrugs.png'],
-            geroNeck: ['img_m_gero_neck.png', 'img_m_gero_neck.png'],
-            geroAnkle: ['img_m_gero_ankle.png', 'img_m_gero_ankle.png'],
-            geroWrists: ['img_m_gero_wrists.png', 'img_m_gero_wrists.png'],
-            geroRow: ['img_m_gero_row_free.png', 'img_m_gero_row_free.png'],
-            geroChest: ['img_m_gero_chest.png', 'img_m_gero_chest.png'],
-            geroSideLeg: ['img_m_gero_side_leg.png', 'img_m_gero_side_leg.png'],
-            geroLegs: ['img_m_gero_legs1.png', 'img_m_gero_legs2.png'],
-            geroSitStand: ['img_m_gero_sitstand1.png', 'img_m_gero_sitstand2.png'],
-            geroBalance: ['img_m_gero_balance1.png', 'img_m_gero_balance2.png'],
-            geroStretch: ['img_m_gero_stretch1.png', 'img_m_gero_stretch1.png']
-        }
+                chair: ['img_m_chair1.png', 'img_m_chair2.png'],
+                mochila: ['img_m_backpack1.png', 'img_m_backpack2.png'],
+                mochilaFrontSquat: ['img_m_gero_sitstand1.png', 'img_m_backpack2.png'],
+                mochilaRow: ['img_m_backpack_row1.png', 'img_m_backpack_row2.png'],
+                mochilaRowSingle: ['img_m_backpack_row_single.png', 'img_m_backpack_row_single.png'],
+                pushups: ['img_m_pushups1.png', 'img_m_pushups2.png'],
+                plank: ['img_m_plank1.png', 'img_m_plank_knee.png'],
+                plankLateral: ['img_m_plank_lateral1.png', 'img_m_plank_lateral2.png'],
+                stretch: ['img_m_stretch1.png', 'img_m_stretch_arms.png'],
+                breathing: ['img_m_breathing1.png', 'img_m_breathing1.png'],
+                geroWarmup: ['img_m_gero_shrugs.png', 'img_m_gero_shrugs.png'],
+                geroNeck: ['img_m_gero_neck.png', 'img_m_gero_neck.png'],
+                geroAnkle: ['img_m_gero_ankle.png', 'img_m_gero_ankle.png'],
+                geroWrists: ['img_m_gero_wrists.png', 'img_m_gero_wrists.png'],
+                geroRow: ['img_m_gero_row_free.png', 'img_m_gero_row_free.png'],
+                geroChest: ['img_m_gero_chest.png', 'img_m_gero_chest.png'],
+                geroSideLeg: ['img_m_gero_side_leg.png', 'img_m_gero_side_leg.png'],
+                geroLegs: ['img_m_gero_legs1.png', 'img_m_gero_legs2.png'],
+                geroSitStand: ['img_m_gero_sitstand1.png', 'img_m_gero_sitstand2.png'],
+                geroBalance: ['img_m_gero_balance1.png', 'img_m_gero_balance2.png'],
+                geroStretch: ['img_m_gero_stretch1.png', 'img_m_gero_stretch1.png']
+            }
         };
 
         const gImg = images[gender] || images['mujer']; // Backup fallback
@@ -836,7 +874,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let coreOptions = [
             { type: 'work', name: coreName, tip: coreTip, duration: lvl === 'avanzado' ? 60 : 30, frames: useAsistedImgs ? seniorImgs.plank : gImg.plank },
-            { type: 'work', name: 'Plancha Lateral Contigua', tip: 'Gira apoyando un solo brazo para impactar oblicuos.', duration: lvl === 'avanzado' ? 45 : 20, frames: useAsistedImgs ? seniorImgs.plank : gImg.plank },
+            { type: 'work', name: 'Plancha Lateral Contigua', tip: 'Gira apoyando un solo brazo para impactar oblicuos.', duration: lvl === 'avanzado' ? 45 : 20, frames: useAsistedImgs ? seniorImgs.plank : gImg.plankLateral },
         ];
         circuitBlock.push(coreOptions[currentDay % coreOptions.length]);
 
@@ -901,7 +939,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             // Descanso entre rondas
             if (r < rounds) {
-                routine.push({ type: 'rest', name: `Descanso Activo (Fin de Ronda ${r})`, tip: 'Hidrátate, sacude brazos y piernas. ¡No te sientes!', duration: 30, frames: gImg.warmup });
+                routine.push({ type: 'rest', name: `Descanso Activo (Fin de Ronda ${r})`, tip: 'Hidrátate, sacude brazos y piernas. ¡No te sientes!', duration: 30, frames: gImg.warmupArms });
             }
         }
 
